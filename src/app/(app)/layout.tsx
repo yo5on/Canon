@@ -2,6 +2,7 @@ import { getContext, ROLE_LABEL } from "@/lib/workspace";
 import { signOut } from "../login/actions";
 import { switchWorkspace } from "./actions";
 import { Nav } from "./nav";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +19,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen md:grid md:grid-cols-[232px_1fr]">
       <aside className="flex flex-col border-b border-line bg-panel md:sticky md:top-0 md:h-screen md:border-r md:border-b-0">
-        <div className="flex items-center justify-between px-5 py-5">
-          <p className="font-mono text-sm font-semibold tracking-[0.35em]">CANON</p>
+        <div className="px-5 py-6">
+          <Link href="/" aria-label="Canon overview" className="flex items-center gap-3">
+            <span className="canon-mark" aria-hidden="true">c</span>
+            <span className="canon-wordmark">canon<span className="text-brass">.</span></span>
+          </Link>
+          <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.16em] text-muted">Brand governance</p>
         </div>
         <Nav />
         <div className="mt-auto hidden border-t border-line px-5 py-4 md:block">
@@ -45,7 +50,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="min-w-0">
-        <header className="flex items-center justify-end gap-3 border-b border-line px-4 py-3 sm:px-8">
+        <header className="flex items-center justify-between gap-3 border-b border-line bg-panel px-4 py-3 sm:px-8">
+          <p className="truncate text-xs text-muted">{active?.orgName ?? "Canon"}</p>
+          <div className="flex items-center gap-3">
           {active && (
             <span className="rounded-md border border-accent/30 bg-accent/10 px-2 py-1 text-xs text-accent">
               {ROLE_LABEL[active.role]}
@@ -58,7 +65,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 {initials}
               </span>
             </summary>
-            <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-line bg-raised p-2 shadow-2xl shadow-black/40">
+            <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-line bg-panel p-2 shadow-lg shadow-black/5">
               <div className="px-3 py-2">
                 <p className="text-sm font-medium">{name}</p>
                 <p className="truncate font-mono text-xs text-muted">{user.email}</p>
@@ -85,8 +92,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               </form>
             </div>
           </details>
+          </div>
         </header>
-        <main className="px-4 py-8 sm:px-8">
+        <main id="main-content" className="mx-auto max-w-[1500px] px-4 py-6 sm:px-8">
           {active ? (
             children
           ) : (

@@ -1,6 +1,6 @@
 // The DEMO/MOCK response, run through the real pipeline against the seeded demo kit, shows all five ledger statuses.
 import { describe, expect, it } from "vitest";
-import { MOCK_DRAFT, mockClient } from "./ai.mock";
+import { MOCK_DRAFT, createMockClient } from "./ai.mock";
 import { modelOutputSchema } from "./ai";
 import { assemble, type FactRow, type RuleRow } from "./pipeline";
 
@@ -12,8 +12,22 @@ const fact = (code: string, text: string, value: number, valid_until: string | n
 });
 
 describe("DEMO/MOCK run", () => {
+  it("does not invent sample findings or claims for a different draft", async () => {
+    const res = await createMockClient("Our new campaign is ready for review.").messages.create({} as never);
+    const text = res.content[0];
+    if (text.type !== "text") throw new Error("Expected mock text");
+    expect(JSON.parse(text.text)).toEqual({ findings: [], claims: [] });
+  });
+  it("checks only sample phrases still present after a revision", async () => {
+    const res = await createMockClient("Trusted by over 1,000 customers.").messages.create({} as never);
+    const text = res.content[0];
+    if (text.type !== "text") throw new Error("Expected mock text");
+    const output = modelOutputSchema.parse(JSON.parse(text.text));
+    expect(output.findings).toHaveLength(0);
+    expect(output.claims.map((c) => c.text)).toEqual(["Trusted by over 1,000 customers"]);
+  });
   it("covers SUPPORTED, CONTRADICTED, OUTDATED, UNSUPPORTED and HUMAN_JUDGEMENT", async () => {
-    const res = (await mockClient.messages.create({} as never)) as unknown as { content: { text: string }[] };
+    const res = (await createMockClient(MOCK_DRAFT).messages.create({} as never)) as unknown as { content: { text: string }[] };
     const ai = modelOutputSchema.parse(JSON.parse(res.content[0].text));
     const rules = [
       rule("TONE-1", "tone", "Write in confident, plain language: no hype words such as revolutionary."),

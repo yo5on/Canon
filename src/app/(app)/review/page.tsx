@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Badge, Card, EmptyState, PageHeader, formatDate, td, th } from "@/components/ui";
 import { memberNames, requireWorkspace } from "@/lib/workspace";
 
@@ -46,7 +47,8 @@ export default async function ReviewQueue() {
               {data.map((i) => (
                 <tr key={i.id}>
                   <td className={td}>
-                    {i.title} <span className="font-mono text-xs text-faint">v{i.current_version}</span>
+                    <Link href={`/submissions/${i.id}`} className="hover:text-accent hover:underline">{i.title}</Link>{" "}
+                    <span className="font-mono text-xs text-faint">v{i.current_version}</span>
                   </td>
                   <td className={td}>{names.get(i.author_id) ?? "—"}</td>
                   <td className={td}>

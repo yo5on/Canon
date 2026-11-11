@@ -102,9 +102,10 @@ describe("claims use the ledger's statuses and become findings when blocking", (
     expect(run([{ text: "Users love", type: "opinion", candidates: [] }]).claims[0]).toMatchObject({ status: null, finding_index: null });
   });
 
-  it("a claim whose words are not in the draft is never blocking", () => {
+  it("a claim whose words are not in the draft never enters the ledger", () => {
     const { claims, findings } = run([{ text: "Rated #1 by analysts", type: "superlative", candidates: [] }]);
-    expect(findings[claims[0].finding_index!]).toMatchObject({ verified: false, severity: "advisory" });
+    expect(claims).toEqual([]);
+    expect(findings.filter((f) => f.origin === "ai")).toEqual([]);
   });
 });
 

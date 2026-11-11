@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { buildPrompt, createAnthropic, MODEL, PROMPT_VERSION, runAi, type AiClient, type AiResult } from "@/lib/ai";
-import { mockClient } from "@/lib/ai.mock";
+import { createMockClient, MOCK_PROMPT_VERSION } from "@/lib/ai.mock";
 import { aiRules, assemble, type FactRow, type RuleRow } from "@/lib/pipeline";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -16,9 +16,9 @@ const DAILY_TOKEN_BUDGET = Number(process.env.CANON_DAILY_TOKEN_BUDGET) || 2_000
 const fail = (status: number, error: string) => NextResponse.json({ error }, { status });
 
 /** The AI client for this request: the explicit DEMO/MOCK provider, the real API, or none. */
-function aiClient(): { client: AiClient; model: string } | null {
+function aiClient(draft: string): { client: AiClient; model: string } | null {
   // Opt-in only; runs are stored with model "mock" and the report labels them DEMO/MOCK, never as Claude output.
-  if (process.env.CANON_AI_MOCK === "1") return { client: mockClient, model: "mock" };
+  if (process.env.CANON_AI_MOCK === "1") return { client: createMockClient(draft), model: "mock" };
   const client = createAnthropic();
   return client ? { client, model: MODEL } : null;
 }
@@ -50,8 +50,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     .single();
   if (!version) return fail(404, "Item not found");
 
-  const ai = aiClient();
+  const ai = aiClient(version.body);
   const model = ai?.model ?? null;
+  const promptVersion = model === "mock" ? MOCK_PROMPT_VERSION : PROMPT_VERSION;
 
   // Same version + prompt + model already finished: reuse it, no second charge.
   if (ai) {
@@ -59,7 +60,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       .from("analysis_runs")
       .select("id")
       .eq("version_id", version.id)
-      .eq("prompt_version", PROMPT_VERSION)
+      .eq("prompt_version", promptVersion)
       .eq("model", ai.model)
       .eq("status", "done")
       .order("created_at", { ascending: false })
@@ -110,7 +111,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const started = Date.now();
   const { data: run, error: runErr } = await admin
     .from("analysis_runs")
-    .insert({ org_id: item.org_id, version_id: version.id, status: "running", model, prompt_version: PROMPT_VERSION })
+    .insert({ org_id: item.org_id, version_id: version.id, status: "running", model, prompt_version: promptVersion })
     .select("id")
     .single();
   if (runErr || !run) return fail(500, "Could not start the check run");
@@ -153,13 +154,17 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return fail(500, "Could not save the check results. Try again.");
   }
 
-  await admin.from("audit_log").insert({
+  const audit = await admin.from("audit_log").insert({
     org_id: item.org_id,
     item_id: item.id,
     actor_id: user.id,
     action: "checks_run",
-    detail: { run_id: run.id, version: item.current_version, status, model, prompt_version: PROMPT_VERSION },
+    detail: { run_id: run.id, version: item.current_version, status, model, prompt_version: promptVersion },
   });
+  if (audit.error) {
+    await admin.from("analysis_runs").delete().eq("id", run.id);
+    return fail(500, "Could not record the check in audit history. Run checks again.");
+  }
 
   return NextResponse.json({ run_id: run.id, status, findings: findings.length, claims: claims.length });
 }

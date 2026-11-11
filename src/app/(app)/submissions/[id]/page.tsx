@@ -4,6 +4,7 @@ import { Badge, CLAIM_STATUS, Card, EmptyState, PageHeader, StatusBadge, formatD
 import { memberNames, requireWorkspace } from "@/lib/workspace";
 import { ReviewForm } from "./review-form";
 import { RunChecks } from "./run-checks";
+import { ReviseForm } from "./revise-form";
 
 export const metadata: Metadata = { title: "Audit report" };
 
@@ -227,7 +228,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
     .single();
   if (!version) notFound();
 
-  const [{ data: run }, names] = await Promise.all([
+  const [runResult, names, reviews] = await Promise.all([
     supabase
       .from("analysis_runs")
       .select("id, status, model, prompt_version, ai_note, duration_ms, created_at")
@@ -236,38 +237,44 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
       .limit(1)
       .maybeSingle(),
     memberNames(active.orgId),
+    supabase.from("approvals").select("id, version, approver_id, decision, reason, created_at").eq("item_id", id).order("created_at", { ascending: false }).limit(10),
   ]);
+  if (runResult.error || reviews.error) throw new Error("Could not load the audit report.");
+  const run = runResult.data;
 
-  const [{ data: findingData }, { data: claimData }] = run
+  const [{ data: findingData, error: findingError }, { data: claimData, error: claimError }] = run
     ? await Promise.all([
         supabase.from("findings").select("*").eq("run_id", run.id),
         supabase.from("claims").select("id, text, type, status, fact_code, reason, finding_id").eq("run_id", run.id),
       ])
-    : [{ data: [] }, { data: [] }];
+    : [{ data: [], error: null }, { data: [], error: null }];
+  if (findingError || claimError) throw new Error("Could not load findings and claims.");
 
   // Blocking first, then advisory, then needs-judgement; draft order within each.
   const rank = (f: Finding) => (!f.verified ? 2 : f.severity === "blocking" ? 0 : 1);
   const findings = ((findingData ?? []) as Finding[]).sort((a, b) => rank(a) - rank(b) || (a.draft_start ?? 1e9) - (b.draft_start ?? 1e9));
   const claims = claimData ?? [];
-  const { data: decisionData } = findings.length
+  const { data: decisionData, error: decisionError } = findings.length
     ? await supabase.from("finding_decisions").select("finding_id, decision, reason, decided_by, created_at").in("finding_id", findings.map((f) => f.id)).order("created_at")
-    : { data: [] };
+    : { data: [], error: null };
+  if (decisionError) throw new Error("Could not load finding decisions.");
   const decisionsFor = (fid: string) => ((decisionData ?? []) as Decision[]).filter((d) => d.finding_id === fid);
   const claimFor = new Map(claims.filter((c) => c.finding_id).map((c) => [c.finding_id as string, c.reason as string]));
 
   // Owner and validity of cited facts. RLS keeps confidential facts hidden from Creators.
   const factCodes = [...new Set(findings.map((f) => f.source_code).filter((c): c is string => !!c?.startsWith("FACT-")))];
-  const { data: factData } = factCodes.length
+  const { data: factData, error: factError } = factCodes.length
     ? await supabase.from("facts").select("code, owner, valid_from, valid_until, replaced_by").eq("org_id", item.org_id).eq("is_current", true).in("code", factCodes)
-    : { data: [] };
+    : { data: [], error: null };
+  if (factError) throw new Error("Could not load cited facts.");
   const facts = new Map((factData ?? []).map((f) => [f.code as string, f as FactInfo]));
 
-  const blocking = findings.filter((f) => f.verified && f.severity === "blocking").length;
+  const blocking = findings.filter((f) => f.verified && f.severity === "blocking" && !decisionsFor(f.id).some((d) => d.decision === "overridden")).length;
   const advisory = findings.filter((f) => f.verified && f.severity === "advisory").length;
   const judgement = findings.filter((f) => !f.verified).length;
   const ai = findings.filter((f) => f.origin === "ai");
   const canRun = ["draft", "changes_requested"].includes(item.status);
-  const rs = run ? RUN_STATUS[run.status] : null;
+  const rs = run?.model === "mock" && run.status === "done" ? { label: "Demo checks complete", tone: "amber" as Tone } : run ? RUN_STATUS[run.status] : null;
   const isAuthor = item.author_id === user.id;
   // UI hint only: decide_finding / decide_item and the approvals trigger enforce the same rules in Postgres.
   const perms: Perms = {
@@ -327,7 +334,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
           </div>
           {run.model === "mock" && (
             <p className="mt-2 rounded-md border border-amber/30 bg-amber/10 px-2 py-1 text-xs text-amber">
-              DEMO / MOCK MODE: these AI findings come from a fixed, deterministic test response, not from Claude. No AI model was called. The evidence verifier and Claims Ledger ran for real on it.
+              DEMO / MOCK MODE: only recognised sample phrases are checked; other wording needs manual review. No AI model was called. Evidence verification and ledger classification run against your Brand Kit.
             </p>
           )}
           {run.ai_note && <p className="mt-2 text-xs text-muted">{run.ai_note} Tone, messaging and claim checks did not run; a reviewer should check them by hand.</p>}
@@ -336,7 +343,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
 
       {run && (
         <div className="mb-4 flex flex-wrap gap-2">
-          <Badge tone="danger">Blocking · {blocking}</Badge>
+          <Badge tone={blocking ? "danger" : "muted"}>Open blocking · {blocking}</Badge>
           <Badge tone="amber">Advisory · {advisory}</Badge>
           <Badge tone="muted">Needs human judgement · {judgement}</Badge>
           <Badge tone="accent">Claims · {claims.filter((c) => c.status).length}</Badge>
@@ -360,12 +367,30 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
       )}
       {isAuthor && perms.inReview && <p className="mb-4 text-xs text-muted">Waiting for a Reviewer. You can’t approve your own submission.</p>}
 
+      {reviews.data.length > 0 && (
+        <Card className="mb-4 px-5 py-4">
+          <h2 className="mb-3 text-sm font-medium">Review history</h2>
+          <ul className="space-y-3">
+            {reviews.data.map((review) => (
+              <li key={review.id} className="text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge status={review.decision} />
+                  <span className="text-xs text-muted">v{review.version} · {names.get(review.approver_id) ?? "Reviewer"} · {formatDateTime(review.created_at)}</span>
+                </div>
+                {review.reason && <p className="mt-1 text-sm">{review.reason}</p>}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       <div className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
         <Card className="self-start">
           <div className="border-b border-line px-5 py-3.5">
             <h2 className="text-sm font-medium">Draft v{item.current_version}</h2>
           </div>
           <Draft body={version.body} findings={findings} />
+          {isAuthor && canRun && <ReviseForm key={version.id} itemId={item.id} body={version.body} />}
         </Card>
 
         <Card className="self-start">
@@ -378,7 +403,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
               body={canRun ? "Run checks to get code and AI findings for this version." : "Checks can only run while the item is a draft or has changes requested."}
             />
           ) : findings.length === 0 ? (
-            <EmptyState title="No issues found" body="No rule was broken by this version. Claims, if any, are listed below." />
+            <EmptyState title="No findings recorded" body={run?.model === "mock" ? "No matching demo findings or code violations. This is not a full AI review; check other wording manually." : "The completed checks reported no findings. Claims, if any, are listed below."} />
           ) : (
             <ol className="divide-y divide-line">
               {findings.map((f, i) => (

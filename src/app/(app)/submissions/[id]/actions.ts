@@ -10,6 +10,7 @@ export type ActionState = { error?: string; ok?: boolean };
 
 const schema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("submit"), item: z.uuid() }),
+  z.object({ kind: z.literal("revise"), item: z.uuid(), body: z.string().trim().min(1, "Enter the revised draft").max(40000, "Drafts are limited to 40,000 characters") }),
   z.object({ kind: z.literal("finding"), item: z.uuid(), finding: z.uuid(), decision: z.enum(["accepted", "rejected", "overridden"]), reason: z.string().trim().max(1000) }),
   z.object({ kind: z.literal("item"), item: z.uuid(), decision: z.enum(["approved", "rejected", "changes_requested"]), reason: z.string().trim().max(1000) }),
 ]);
@@ -29,14 +30,16 @@ const KNOWN = [
 
 export async function reviewAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const parsed = schema.safeParse(Object.fromEntries(form.entries()));
-  if (!parsed.success) return { error: "Invalid request." };
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
-  if ((d.kind !== "submit" && d.decision !== "accepted" && d.decision !== "approved") && d.reason.length < 3)
+  if ((d.kind === "finding" || d.kind === "item") && d.decision !== "accepted" && d.decision !== "approved" && d.reason.length < 3)
     return { error: "Give a reason (at least 3 characters)." };
 
   const { supabase } = await requireWorkspace();
   const { error } =
-    d.kind === "submit"
+    d.kind === "revise"
+      ? await supabase.rpc("revise_item", { p_item: d.item, p_body: d.body })
+      : d.kind === "submit"
       ? await supabase.rpc("submit_for_review", { p_item: d.item })
       : d.kind === "finding"
         ? await supabase.rpc("decide_finding", { p_finding: d.finding, p_decision: d.decision, p_reason: d.reason })
@@ -47,5 +50,9 @@ export async function reviewAction(_prev: ActionState, form: FormData): Promise<
   }
   revalidatePath(`/submissions/${d.item}`);
   revalidatePath("/review");
+  revalidatePath("/submissions");
+  revalidatePath("/claims");
+  revalidatePath("/audit");
+  revalidatePath("/");
   return { ok: true };
 }
