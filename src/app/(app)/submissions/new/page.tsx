@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/ui";
 import { ROLE_LABEL, requireWorkspace, type Role } from "@/lib/workspace";
+import { MOCK_DRAFT } from "@/lib/ai.mock";
 import { SubmitForm } from "./form";
 
 export const metadata: Metadata = { title: "Submit content" };
@@ -18,7 +19,7 @@ export default async function NewSubmission() {
   return (
     <>
       <PageHeader crumb="Content / Submissions" title="Submit content for checks" subtitle="Saved as draft v1. You run checks on the next screen." />
-      <SubmitForm reviewers={reviewers} today={new Date().toISOString().slice(0, 10)} />
+      <SubmitForm reviewers={reviewers} today={new Date().toISOString().slice(0, 10)} mockDraft={process.env.CANON_AI_MOCK === "1" ? MOCK_DRAFT : null} />
     </>
   );
 }

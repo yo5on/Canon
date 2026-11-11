@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 export default function LoginPage() {
   const demos = DEMO_ACCOUNTS.flatMap((d) => {
     const acc = demoAccount(d.key);
-    return acc ? [{ ...d, ...acc }] : [];
+    // The password stays on the server: the demo button sends only the account key.
+    return acc ? [{ ...d, email: acc.email }] : [];
   });
 
   return (

@@ -25,7 +25,12 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) return { error: "Email or password is incorrect.", email: parsed.data.email };
+  if (error) {
+    if (error.code === "invalid_credentials") return { error: "Email or password is incorrect.", email: parsed.data.email };
+    // Not a credentials problem (network, config, rate limit): say so instead of blaming the password.
+    console.error("sign-in failed:", error.status, error.code, error.message);
+    return { error: "Sign-in is unavailable right now. Try again shortly.", email: parsed.data.email };
+  }
   redirect("/");
 }
 
