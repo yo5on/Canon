@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { reviewAction, type ActionState } from "./actions";
 
 type Choice = { value: string; label: string; tone?: "danger" | "ok" | "plain" };
@@ -14,6 +14,10 @@ const TONE = {
 /** One small form for every review action. Hidden fields pick the RPC; the clicked button sets the decision. */
 export function ReviewForm({ fields, choices, reason }: { fields: Record<string, string>; choices: Choice[]; reason?: string }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(reviewAction, {});
+  useEffect(() => {
+    // A fresh document avoids leaving the streamed report pending after a saved decision.
+    if (state.ok) window.location.reload();
+  }, [state.ok]);
   return (
     <form action={action} className="flex flex-col gap-2">
       {Object.entries(fields).map(([k, v]) => (
