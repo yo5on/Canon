@@ -1,10 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { reviewAction, type ActionState } from "./actions";
 
 export function ReviseForm({ itemId, body }: { itemId: string; body: string }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(reviewAction, {});
+  useEffect(() => {
+    if (state.ok) window.location.reload();
+  }, [state.ok]);
   return (
     <details className="border-t border-line px-5 py-4">
       <summary className="text-sm font-medium text-accent">Edit draft</summary>

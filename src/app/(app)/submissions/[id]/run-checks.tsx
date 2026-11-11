@@ -1,12 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 export function RunChecks({ itemId, label }: { itemId: string; label: string }) {
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [refreshing, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   async function run() {
@@ -16,7 +13,7 @@ export function RunChecks({ itemId, label }: { itemId: string; label: string }) 
       const res = await fetch(`/api/items/${itemId}/analyze`, { method: "POST" });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) setError(body.error ?? "Checks failed. Try again.");
-      else startTransition(() => router.refresh());
+      else window.location.reload();
     } catch {
       setError("Could not reach Canon. Check your connection and try again.");
     } finally {
@@ -24,7 +21,7 @@ export function RunChecks({ itemId, label }: { itemId: string; label: string }) 
     }
   }
 
-  const pending = busy || refreshing;
+  const pending = busy;
   return (
     <div className="flex flex-col items-end gap-1">
       <button

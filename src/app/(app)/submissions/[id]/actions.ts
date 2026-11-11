@@ -2,7 +2,6 @@
 
 // Review workflow (ROUND2_PLAN §4). Every state change goes through the Postgres functions in 0001_init.sql,
 // called as the signed-in user: they and the approvals trigger enforce roles, "no self-approval" and the audit log.
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireWorkspace } from "@/lib/workspace";
 
@@ -48,11 +47,5 @@ export async function reviewAction(_prev: ActionState, form: FormData): Promise<
     const known = KNOWN.find((k) => error.message.includes(k));
     return { error: known ? error.message : "Could not save that decision. Try again." };
   }
-  revalidatePath(`/submissions/${d.item}`);
-  revalidatePath("/review");
-  revalidatePath("/submissions");
-  revalidatePath("/claims");
-  revalidatePath("/audit");
-  revalidatePath("/");
   return { ok: true };
 }
