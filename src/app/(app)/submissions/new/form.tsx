@@ -62,8 +62,8 @@ export function SubmitForm({ reviewers, today, mockDraft }: { reviewers: { id: s
             <input id="publish_date" name="publish_date" type="date" required min={today} defaultValue={v.publish_date} className="field" {...aria("publish_date")} />
           </Field>
           <Field label="Reviewer" name="reviewer" error={e?.reviewer} hint="You can’t review your own item.">
-            <select id="reviewer" name="reviewer" defaultValue={v.reviewer ?? ""} className="field" {...aria("reviewer")}>
-              <option value="">Choose later</option>
+            <select id="reviewer" name="reviewer" required defaultValue={v.reviewer ?? ""} className="field" {...aria("reviewer")}>
+              <option value="" disabled>Choose a reviewer</option>
               {reviewers.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name} · {r.role}
@@ -76,7 +76,7 @@ export function SubmitForm({ reviewers, today, mockDraft }: { reviewers: { id: s
             <p className="label mb-1.5">What will run</p>
             <p>● Code checks: banned terms. Free, always run.</p>
             {mockDraft ? (
-              <p className="mt-1">● AI checks: DEMO/MOCK mode. A fixed test response stands in for the AI; no model is called. The draft is prefilled with the matching demo text.</p>
+              <p className="mt-1">● DEMO/MOCK checks: only recognised sample phrases are checked. Other wording needs manual review. No AI model is called.</p>
             ) : (
               <p className="mt-1">● AI checks: tone, messaging, claims. One Claude Sonnet call, with your rules and non-confidential facts only.</p>
             )}

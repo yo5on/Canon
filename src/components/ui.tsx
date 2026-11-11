@@ -24,7 +24,7 @@ export function PageHeader({
 }
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-xl border border-line bg-panel ${className}`}>{children}</section>;
+  return <section className={`rounded-md border border-line bg-panel ${className}`}>{children}</section>;
 }
 
 const TONES = {

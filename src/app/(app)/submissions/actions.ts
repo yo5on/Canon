@@ -15,7 +15,7 @@ const itemSchema = z.object({
   audience: z.string().trim().max(120),
   goal: z.string().trim().max(300, "Keep the goal to one line (300 characters)"),
   publish_date: z.iso.date({ message: "Choose the planned publish date" }),
-  reviewer: z.union([z.literal(""), z.uuid()]).transform((s) => s || null),
+  reviewer: z.uuid("Choose a reviewer before saving"),
   body: z.string().trim().min(1, "Paste the draft text").max(40000, "Drafts are limited to about 6,000 words"),
 });
 

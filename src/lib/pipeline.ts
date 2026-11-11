@@ -149,6 +149,8 @@ export function assemble(
   const fallbackRule = claimRule(sent);
 
   for (const c of ai.claims) {
+    // A proposal about words absent from the draft must never enter the ledger.
+    if (!normalize(c.text) || !normDraft.includes(normalize(c.text))) continue;
     const res = decideClaim(c, ledgerFacts, publishDate);
     let finding_index: number | null = null;
 

@@ -26,6 +26,11 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
   const onLogin = request.nextUrl.pathname === "/login";
 
+  if (!user && request.nextUrl.pathname.startsWith("/api/")) {
+    const denied = NextResponse.json({ error: "Sign in first" }, { status: 401 });
+    response.cookies.getAll().forEach((c) => denied.cookies.set(c));
+    return denied;
+  }
   if (!user && !onLogin) return redirectKeepingCookies(request, response, "/login");
   if (user && onLogin) return redirectKeepingCookies(request, response, "/");
   return response;

@@ -8,12 +8,13 @@ export const metadata: Metadata = { title: "Submit content" };
 
 export default async function NewSubmission() {
   const { supabase, user, active } = await requireWorkspace();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("memberships")
     .select("user_id, display_name, role")
     .eq("org_id", active.orgId)
     .in("role", ["reviewer", "brand_manager"])
     .neq("user_id", user.id);
+  if (error) throw new Error("Could not load reviewers.");
   const reviewers = (data ?? []).map((m) => ({ id: m.user_id as string, name: (m.display_name as string) || "Member", role: ROLE_LABEL[m.role as Role] }));
 
   return (

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Card, EmptyState, PageHeader, StatusBadge, formatDateTime } from "@/components/ui";
+import { ButtonLink, Card, EmptyState, PageHeader, StatusBadge, formatDateTime } from "@/components/ui";
 import { factState } from "@/lib/brandkit";
-import { ROLE_LABEL, requireWorkspace } from "@/lib/workspace";
+import { requireWorkspace } from "@/lib/workspace";
 
 export default async function Overview() {
   const { supabase, user, active } = await requireWorkspace();
@@ -30,15 +30,16 @@ export default async function Overview() {
     <>
       <PageHeader
         crumb={active.orgName}
-        title={`Welcome back, ${active.displayName.split(" ")[0]}`}
-        subtitle={`Signed in as ${ROLE_LABEL[active.role]}. Here’s where the workspace stands.`}
+        title="Workspace overview"
+        subtitle="Content, evidence and decisions at a glance."
+        actions={<ButtonLink href="/submissions/new" primary>New submission</ButtonLink>}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((s) => (
-          <Link key={s.label} href={s.href} className="group rounded-xl border border-line bg-panel p-5 hover:border-accent/40">
-            <p className="label">{s.label}</p>
-            <p className="mt-3 text-3xl font-semibold tabular-nums">{s.value}</p>
+          <Link key={s.label} href={s.href} className="group rounded-xl border border-line border-t-2 border-t-brass bg-panel p-5 hover:border-accent/40">
+            <p className="text-xs font-medium text-muted">{s.label}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight tabular-nums">{s.value}</p>
             <p className="mt-1 text-xs text-muted group-hover:text-ink">{s.note}</p>
           </Link>
         ))}
@@ -61,7 +62,7 @@ export default async function Overview() {
             <ul className="divide-y divide-line">
               {list.slice(0, 6).map((i) => (
                 <li key={i.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
-                  <span className="truncate">{i.title}</span>
+                  <Link href={`/submissions/${i.id}`} className="truncate hover:text-accent hover:underline">{i.title}</Link>
                   <StatusBadge status={i.status} />
                 </li>
               ))}

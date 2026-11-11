@@ -3,6 +3,9 @@
 // The fixed response targets MOCK_DRAFT and the Canon Demo Co. kit; it still goes through the real Zod schema,
 // verifier and Claims Ledger, and includes one deliberately wrong quote to show the downgrade path.
 import type { AiClient, ModelOutput } from "./ai";
+import { normalize } from "./verifier";
+
+export const MOCK_PROMPT_VERSION = "canon-demo-v2";
 
 export const MOCK_DRAFT =
   "Canon Demo Co. now serves more than 5,000 customers and is the fastest-growing platform in India. " +
@@ -43,12 +46,16 @@ const RESPONSE: ModelOutput = {
   ],
 };
 
-export const mockClient = {
+// shortcut: recognises only the sample phrases; use a real provider for general draft analysis.
+export const createMockClient = (draft: string) => ({
   messages: {
     create: async () => ({
-      content: [{ type: "text", text: JSON.stringify(RESPONSE) }],
+      content: [{ type: "text", text: JSON.stringify({
+        findings: RESPONSE.findings.filter((f) => normalize(draft).includes(normalize(f.draft_quote))),
+        claims: RESPONSE.claims.filter((c) => normalize(draft).includes(normalize(c.text))),
+      }) }],
       stop_reason: "end_turn",
       usage: { input_tokens: 0, output_tokens: 0 },
     }),
   },
-} as unknown as AiClient;
+}) as unknown as AiClient;

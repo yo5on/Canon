@@ -52,7 +52,8 @@ export const getContext = cache(async () => {
 /** Display names of everyone in the workspace, keyed by user id (RLS: members only see their own workspace). */
 export async function memberNames(orgId: string) {
   const { supabase } = await getContext();
-  const { data } = await supabase.from("memberships").select("user_id, display_name").eq("org_id", orgId);
+  const { data, error } = await supabase.from("memberships").select("user_id, display_name").eq("org_id", orgId);
+  if (error) throw new Error("Could not load workspace members.");
   return new Map((data ?? []).map((m) => [m.user_id as string, (m.display_name as string) || "Member"]));
 }
 
