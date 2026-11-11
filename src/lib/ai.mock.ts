@@ -7,7 +7,8 @@ import type { AiClient, ModelOutput } from "./ai";
 export const MOCK_DRAFT =
   "Canon Demo Co. now serves more than 5,000 customers and is the fastest-growing platform in India. " +
   "Our revolutionary dashboard helps users ship campaigns in minutes. " +
-  "Trusted by over 1,000 customers — you'll wonder how you ever worked without it.";
+  "Trusted by over 1,000 customers — you'll wonder how you ever worked without it. " +
+  "Rated 4.8 out of 5 by customers, and now available in 12 countries.";
 
 const RESPONSE: ModelOutput = {
   findings: [
@@ -35,6 +36,10 @@ const RESPONSE: ModelOutput = {
     { text: "the fastest-growing platform in India", type: "superlative", candidates: [] },
     { text: "Trusted by over 1,000 customers", type: "number", candidates: [{ fact_id: "FACT-1", relation: "ENTAILS", quote: "serves 1,200 customers" }] },
     { text: "you'll wonder how you ever worked without it", type: "opinion", candidates: [] },
+    // FACT-2 expired before any future publish date → OUTDATED
+    { text: "Rated 4.8 out of 5 by customers", type: "number", candidates: [{ fact_id: "FACT-2", relation: "ENTAILS", quote: "rated 4.8 out of 5" }] },
+    // the quote is not in FACT-3 → HUMAN_JUDGEMENT
+    { text: "now available in 12 countries", type: "number", candidates: [{ fact_id: "FACT-3", relation: "ENTAILS", quote: "available in 12 countries" }] },
   ],
 };
 

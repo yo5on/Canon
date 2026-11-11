@@ -24,7 +24,7 @@ function Field({ label, name, error, hint, children }: { label: string; name: st
   );
 }
 
-export function SubmitForm({ reviewers, today }: { reviewers: { id: string; name: string; role: string }[]; today: string }) {
+export function SubmitForm({ reviewers, today, mockDraft }: { reviewers: { id: string; name: string; role: string }[]; today: string; mockDraft: string | null }) {
   const [state, action, pending] = useActionState<SubmitState, FormData>(createItem, {});
   const e = state.errors;
   const v = state.values ?? {};
@@ -38,7 +38,7 @@ export function SubmitForm({ reviewers, today }: { reviewers: { id: string; name
             <input id="title" name="title" required maxLength={200} defaultValue={v.title} className="field" {...aria("title")} />
           </Field>
           <Field label="Draft text" name="body" error={e?.body} hint="Pasted text only in this release. Checked word for word.">
-            <textarea id="body" name="body" required rows={14} maxLength={40000} defaultValue={v.body} className="field leading-relaxed" {...aria("body")} />
+            <textarea id="body" name="body" required rows={14} maxLength={40000} defaultValue={v.body ?? mockDraft ?? undefined} className="field leading-relaxed" {...aria("body")} />
           </Field>
         </div>
       </div>
@@ -75,7 +75,11 @@ export function SubmitForm({ reviewers, today }: { reviewers: { id: string; name
           <div className="rounded-lg border border-line bg-canvas p-3 text-xs text-muted">
             <p className="label mb-1.5">What will run</p>
             <p>● Code checks: banned terms. Free, always run.</p>
-            <p className="mt-1">● AI checks: tone, messaging, claims. One Claude Sonnet call, with your rules and non-confidential facts only.</p>
+            {mockDraft ? (
+              <p className="mt-1">● AI checks: DEMO/MOCK mode. A fixed test response stands in for the AI; no model is called. The draft is prefilled with the matching demo text.</p>
+            ) : (
+              <p className="mt-1">● AI checks: tone, messaging, claims. One Claude Sonnet call, with your rules and non-confidential facts only.</p>
+            )}
           </div>
 
           {e?.form && (

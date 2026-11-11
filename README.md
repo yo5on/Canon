@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Canon
 
-## Getting Started
+Brand compliance with citations. A Creator submits marketing text; Canon runs code checks and an AI audit,
+verifies every quote against the Brand Kit, decides each claim's status in the **Claims Ledger**
+(SUPPORTED, CONTRADICTED, OUTDATED, UNSUPPORTED, HUMAN_JUDGEMENT), and a Reviewer approves, requests changes or rejects.
+Permissions live in Postgres (RLS, state-change functions, approval trigger, append-only audit log).
+See `docs/ROUND2_PLAN.md` and `docs/SECURITY_HARDENING.md`.
 
-First, run the development server:
+## DEMO/MOCK mode
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+With `CANON_AI_MOCK=1` and no `ANTHROPIC_API_KEY`, the AI call is replaced by a fixed, deterministic test response
+(`src/lib/ai.mock.ts`). **No AI model is called.** Runs are stored with model `mock` and every report is labelled
+DEMO/MOCK. The verifier, Claims Ledger, findings and review workflow all run for real on that response. The new-submission
+form is prefilled with the matching demo draft.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. `npm install`
+2. `.env.local`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `CANON_AI_MOCK=1`.
+   Demo logins go in `.env.demo-accounts.local` (`DEMO_MANAGER_EMAIL`/`_PASSWORD`, `DEMO_REVIEWER_*`, `DEMO_CREATOR_*`, `DEMO_OUTSIDER_*`).
+   Both files are gitignored. In a deployment, set the same variables in the host.
+3. Apply `supabase/migrations/0001`–`0004` in order (SQL editor or `supabase db push`).
+4. `node scripts/seed-demo.mjs` creates the demo users, the fictional "Canon Demo Co." workspace (Brand Kit rules and facts,
+   one confidential) and a "Rival Demo Ltd." workspace for isolation tests. It is idempotent.
+5. `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Checks
 
-## Learn More
+- `npm test` unit tests, plus live RLS tests when the env files are present
+- `node scripts/e2e-api.mjs` workflow and permission checks against the live project (creates `[E2E]` items)
+- `supabase/tests/security.sql` paste into the SQL editor; everything rolls back
+- `npm run lint`, `npx tsc --noEmit`, `npm run build`
 
-To learn more about Next.js, take a look at the following resources:
+## Demo accounts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Role | Email |
+|---|---|
+| Brand Manager | manager@canon-demo.test |
+| Reviewer | reviewer@canon-demo.test |
+| Creator | creator@canon-demo.test |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The login page has one-click demo sign-in; passwords stay on the server.
