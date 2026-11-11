@@ -49,6 +49,7 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
       <PageHeader
         crumb="Brand Kit"
         title="Brand Kit"
+        icon="book"
         subtitle={`${rules.data.length} rules · ${facts.data.length} approved facts${isManager ? "" : " · read-only for your role"}`}
         actions={
           isManager &&
@@ -158,7 +159,7 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
                 </thead>
                 <tbody className="divide-y divide-line">
                   {facts.data.map((f, i) => (
-                    <tr key={f.id} className="hover:bg-raised/40">
+                    <tr key={f.id} id={`fact-${f.code}`} className="scroll-mt-6 hover:bg-raised/40">
                       <td className={`${td} whitespace-nowrap font-mono text-xs`}>
                         {f.code} <span className="text-faint">v{f.version}</span>
                       </td>

@@ -49,7 +49,7 @@ function Shell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="max-w-2xl rounded-xl border border-line bg-panel p-6">
+    <div className="max-w-2xl border-t border-line pt-6">
       <div className="grid gap-5 sm:grid-cols-2">{children}</div>
       {state.errors?.form && (
         <p role="alert" className="mt-5 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
