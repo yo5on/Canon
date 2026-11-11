@@ -162,6 +162,15 @@ begin
   res := res || pg_temp.expect('no_change has pinned search_path',
     (select (proconfig = array['search_path=""'])::text from pg_proc where oid = 'private.no_change()'::regprocedure), 'true');
 
+  -- ── 9b. Confidential facts (migration 0004): hidden from Creators, visible to Reviewers/Managers ──
+  res := res || pg_temp.expect('creator reads 0 confidential facts', pg_temp.act('authenticated', C, format('select count(*) from public.facts where org_id = %L and confidential', canon)), '0');
+  res := res || pg_temp.expect('creator still reads non-confidential facts', pg_temp.act('authenticated', C, format('select (count(*) > 0)::text from public.facts where org_id = %L and not confidential', canon)), 'true');
+  res := res || pg_temp.expect('reviewer reads confidential facts', pg_temp.act('authenticated', R, format('select (count(*) > 0)::text from public.facts where org_id = %L and confidential', canon)), 'true');
+  res := res || pg_temp.expect('manager reads confidential facts', pg_temp.act('authenticated', M, format('select (count(*) > 0)::text from public.facts where org_id = %L and confidential', canon)), 'true');
+  res := res || pg_temp.expect('creator cannot insert fact', pg_temp.act('authenticated', C, format('insert into public.facts (org_id, code, text) values (%L, ''FACT-99'', ''x y'') returning 1', canon)), 'ERR: new row violates row-level security%');
+  res := res || pg_temp.expect('reviewer cannot insert rule', pg_temp.act('authenticated', R, format('insert into public.rules (org_id, code, text, category, severity, check_kind) values (%L, ''X-9'', ''rule text'', ''tone'', ''advisory'', ''ai'') returning 1', canon)), 'ERR: new row violates row-level security%');
+  res := res || pg_temp.expect('creator updates 0 rules', pg_temp.act('authenticated', C, format('with u as (update public.rules set text = text where org_id = %L returning 1) select count(*) from u', canon)), '0');
+
   -- ── 10. Same-workspace creator is not an eligible reviewer (needs a 2nd creator; last, it changes membership) ──
   perform pg_temp.act('authenticated', M, format('select public.add_member(%L, %L, ''creator'')', canon, (select email from auth.users where id = O)));
   res := res || pg_temp.expect('manager add_member works (outsider joins as creator)', (select role::text from memberships where org_id = canon and user_id = O), 'creator');

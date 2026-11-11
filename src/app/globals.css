@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Canon identity (Round 1 wireframes): deep teal-black canvas, teal accent, amber/red signals, mono labels. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-canvas: #071318;
+  --color-panel: #0b1c22;
+  --color-raised: #10262d;
+  --color-line: #1b3740;
+  --color-ink: #e6f1f2;
+  --color-muted: #8aa4aa;
+  --color-faint: #5d777d;
+  --color-accent: #4fd1c5;
+  --color-accent-ink: #052a27;
+  --color-amber: #f2b54b;
+  --color-danger: #f0776b;
+  --color-ok: #6fd39a;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-canvas);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+.field:focus {
+  border-color: var(--color-accent);
+  outline: none;
 }
