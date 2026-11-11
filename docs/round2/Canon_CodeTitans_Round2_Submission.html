@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Canon · Round 2 Submission · Team codeX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<!-- Editable source. Export: Edge/Chrome → Print → Save as PDF, A4, Margins: None, Background graphics: on.
+     Or headless: msedge --headless --print-to-pdf=out.pdf --no-pdf-header-footer this.html -->
+<style>
+:root{
+  --paper:#FBFAF7; --ink:#1C2321; --body:#2E3532; --muted:#5F6661; --faint:#8B918C;
+  --line:#E3E0D8; --soft:#F2F0EA;
+  --accent:#28645A; --accent-ink:#1E4D45; --accent-soft:#E6EFEB;
+  --amber:#8A5D20; --amber-soft:#F6EEDF; --red:#A9392F; --red-soft:#F7E6E3; --slate:#4F5A66; --slate-soft:#EAEDF0;
+  --serif:"Source Serif 4",Georgia,serif; --sans:Inter,"Segoe UI",system-ui,sans-serif; --mono:"JetBrains Mono",Consolas,monospace;
+}
+@page{size:A4;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#d9d7d1}
+body{font-family:var(--sans);color:var(--body);font-size:9.4pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;margin:0 auto 8mm;background:var(--paper);position:relative;overflow:hidden;padding:19mm 18mm 20mm;page-break-after:always;break-after:page}
+@media print{html,body{background:var(--paper)}.page{margin:0}}
+.page:last-child{page-break-after:auto;break-after:auto}
+
+/* running header / footer */
+.run{position:absolute;left:18mm;right:18mm;top:9mm;display:flex;justify-content:space-between;font:500 7pt/1 var(--mono);letter-spacing:.06em;color:var(--faint);text-transform:uppercase}
+.foot{position:absolute;left:18mm;right:18mm;bottom:9mm;display:flex;justify-content:space-between;align-items:center;font:500 7pt/1 var(--mono);color:var(--faint);border-top:1px solid var(--line);padding-top:3mm}
+.foot b{color:var(--ink);font-weight:500}
+
+/* type */
+.kicker{font:500 7.5pt/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:3mm}
+h1{font:700 25pt/1.1 var(--serif);color:var(--ink);letter-spacing:-.01em;margin-bottom:4mm}
+h2{font:600 12.5pt/1.25 var(--serif);color:var(--ink);margin:6mm 0 2.2mm}
+h3{font:600 9.4pt/1.3 var(--sans);color:var(--ink);margin:0 0 1.2mm}
+p{margin-bottom:2.4mm}
+.lede{font:400 11.2pt/1.5 var(--serif);color:var(--body);max-width:155mm;margin-bottom:5mm}
+.muted{color:var(--muted)} .small{font-size:8.2pt} .mono{font-family:var(--mono);font-size:8pt}
+code{font-family:var(--mono);font-size:7.9pt;background:var(--soft);padding:.2mm 1mm;border-radius:1mm;color:var(--ink)}
+ul.clean{list-style:none} ul.clean li{padding-left:4mm;position:relative;margin-bottom:1.4mm}
+ul.clean li::before{content:"";position:absolute;left:0;top:2.1mm;width:1.6mm;height:1px;background:var(--accent)}
+strong{color:var(--ink);font-weight:600}
+
+/* layout */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.rule{border-top:1px solid var(--line);margin:5mm 0}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:8.3pt;line-height:1.42}
+th{font:600 6.9pt/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:2mm 2.2mm;border-bottom:1.2px solid var(--ink)}
+td{padding:2mm 2.2mm;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child,th:first-child{padding-left:0}
+td.k{font-weight:600;color:var(--ink);white-space:nowrap}
+td.c{font-family:var(--mono);font-size:7.3pt;color:var(--muted)}
+
+/* callouts */
+.note{border-left:2.5px solid var(--accent);background:var(--accent-soft);padding:3mm 4mm;margin:4mm 0;font-size:8.8pt}
+.note.warn{border-color:var(--amber);background:var(--amber-soft)}
+.note h3{margin-bottom:.8mm}
+.panel{border:1px solid var(--line);background:#fff;padding:4mm;border-radius:1.2mm}
+
+/* chips */
+.chip{display:inline-block;font:600 6.6pt/1 var(--mono);letter-spacing:.04em;padding:1mm 1.6mm;border-radius:.8mm;white-space:nowrap}
+.s-sup{background:var(--accent-soft);color:var(--accent-ink)}
+.s-con{background:var(--red-soft);color:var(--red)}
+.s-out{background:var(--amber-soft);color:var(--amber)}
+.s-uns{background:#F4EADF;color:#7A4A1E}
+.s-hj{background:var(--slate-soft);color:var(--slate)}
+.s-built{background:var(--accent-soft);color:var(--accent-ink)}
+.s-part{background:var(--amber-soft);color:var(--amber)}
+.s-def{background:var(--soft);color:var(--muted)}
+
+/* figures */
+figure{margin:0}
+figure img{display:block;width:100%;border:1px solid var(--line);border-radius:1mm}
+figcaption{font-size:7.6pt;color:var(--muted);margin-top:1.6mm;line-height:1.4}
+figcaption b{color:var(--ink);font-weight:600}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1.2px solid var(--ink);border-bottom:1px solid var(--line)}
+.stat{padding:3.2mm 3mm 3.2mm 0}
+.stat+.stat{padding-left:3mm;border-left:1px solid var(--line)}
+.stat .n{font:600 19pt/1 var(--serif);color:var(--ink)}
+.stat .l{font-size:7.6pt;color:var(--muted);margin-top:1.2mm;line-height:1.35}
+
+/* roadmap */
+.rm{display:grid;grid-template-columns:14mm 1fr;gap:4mm;padding:3.4mm 0;border-top:1px solid var(--line)}
+.rm .num{font:600 22pt/1 var(--serif);color:var(--accent)}
+.rm h3{font:600 12pt/1.25 var(--serif);margin-bottom:1.6mm}
+.rm .grid{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-top:1.4mm}
+.rm ul.clean li{margin-bottom:.8mm;font-size:8.7pt;line-height:1.42}
+.rm p{margin-bottom:1mm}
+table.dense td{padding:1.5mm 2mm;font-size:8pt;line-height:1.38}
+table.dense td:first-child{padding-left:0}
+.rm .lab{font:600 6.8pt/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1.4mm}
+
+/* cover */
+.cover{padding:0;background:var(--paper)}
+.cover .band{position:absolute;left:0;top:0;bottom:0;width:9mm;background:var(--accent)}
+.cover .inner{position:absolute;left:30mm;right:22mm;top:30mm;bottom:22mm;display:flex;flex-direction:column}
+.cover .word{font:700 58pt/1 var(--sans);letter-spacing:.2em;color:var(--ink);margin:10mm 0 5mm}
+.cover .tag{font:400 18pt/1.3 var(--serif);color:var(--ink);font-style:italic;margin-bottom:8mm}
+.cover .desc{font:400 11pt/1.55 var(--serif);color:var(--body);max-width:120mm}
+.cover .meta{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:6mm 10mm;border-top:1.2px solid var(--ink);padding-top:6mm}
+.cover .meta .lab{font:600 6.8pt/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.6mm}
+.cover .meta div div{font-size:9.4pt;color:var(--ink);line-height:1.5}
+
+/* contents */
+.toc{width:100%}
+.toc td{padding:2.4mm 0;font-size:9.6pt}
+.toc td.n{width:12mm;font-family:var(--mono);font-size:8pt;color:var(--accent)}
+.toc td.p{width:12mm;text-align:right;font-family:var(--mono);font-size:8pt;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- 1 · COVER -->
+<section class="page cover">
+  <div class="band"></div>
+  <div class="inner">
+    <div class="kicker">CodeTitans India 2026 · Round 2 Submission</div>
+    <div class="word">CANON</div>
+    <div class="tag">Brand governance with receipts.</div>
+    <p class="desc">A pre-publication brand-compliance workspace. Every finding cites the guideline or approved fact behind it, code checks that citation before anyone sees it, and a human reviewer makes the final call.</p>
+    <p class="desc muted" style="margin-top:4mm;font-size:9.6pt">Round 1 was the plan. This document reports what we built in Round 2, what changed from the plan and why, what is not finished, and what comes next.</p>
+    <div class="meta">
+      <div><div class="lab">Team</div><div>codeX</div></div>
+      <div><div class="lab">Institution</div><div>CHRIST (Deemed to be University), Kengeri Campus</div></div>
+      <div><div class="lab">Members</div><div>Yoson Y · Raphael Roger A<br>Bryan Donato Anand · Macario Andric</div></div>
+      <div><div class="lab">Date</div><div>11 November 2026</div></div>
+      <div><div class="lab">Live deployment</div><div class="mono" style="font-size:8.6pt">canon-rose.vercel.app/login</div></div>
+      <div><div class="lab">Repository</div><div class="mono" style="font-size:8.6pt">github.com/yo5on/Canon</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · CONTENTS + AT A GLANCE -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span style="text-transform:none">Team codeX</span></div>
+  <div class="kicker">Contents</div>
+  <h1>Round 2 at a glance</h1>
+  <p class="lede">Canon is built and deployed. A Creator can submit marketing text, Canon checks it against the workspace's Brand Kit, every claim lands in the Claims Ledger with a status decided by code, and a Reviewer approves, requests changes or rejects, with every decision recorded.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">3</div><div class="l">roles enforced in Postgres: Creator, Reviewer, Brand Manager</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">code checks every AI citation must pass before it can block</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">Claims Ledger statuses, decided by code, not by the model</div></div>
+    <div class="stat"><div class="n">72</div><div class="l">automated tests passing (Vitest, 9 files, run 11 Nov 2026)</div></div>
+  </div>
+
+  <div class="note warn">
+    <h3>Read this first: the live deployment uses mock AI analysis</h3>
+    Production runs with <code>CANON_AI_MOCK=1</code>. The AI step returns a fixed, deterministic sample response instead of calling Claude Sonnet. Everything after that step is real: Zod validation, the evidence verifier, the Claims Ledger, findings, review decisions and the audit log. Every report produced this way is labelled <strong>DEMO/MOCK</strong>. The live Claude Sonnet 5.5 integration is implemented in <code>src/lib/ai.ts</code> but is not switched on in production. Mock output only matches the sample phrases in the demo draft; other text gets code checks and the ledger, not general AI analysis.
+  </div>
+
+  <h2 style="margin-top:7mm">Contents</h2>
+  <table class="toc">
+    <tr><td class="n">01</td><td>Original problem and proposed solution</td><td class="p">03</td></tr>
+    <tr><td class="n">02</td><td>What Canon actually does</td><td class="p">04</td></tr>
+    <tr><td class="n">03</td><td>Implemented features and roles</td><td class="p">05</td></tr>
+    <tr><td class="n">04</td><td>System architecture and technology stack</td><td class="p">07</td></tr>
+    <tr><td class="n">05</td><td>Core content-to-review workflow</td><td class="p">09</td></tr>
+    <tr><td class="n">06</td><td>Changes from the Round 1 proposal</td><td class="p">11</td></tr>
+    <tr><td class="n">07</td><td>Current limitations and unfinished features</td><td class="p">12</td></tr>
+    <tr><td class="n">08</td><td>Round 3: three substantial improvements</td><td class="p">13</td></tr>
+    <tr><td class="n">—</td><td>Team, evidence and disclosures</td><td class="p">14</td></tr>
+  </table>
+
+  <div class="foot"><span>Contents</span><b>02</b></div>
+</section>
+
+<!-- 3 · PROBLEM + PROPOSED SOLUTION -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>01 · Problem and proposal</span></div>
+  <div class="kicker">01 · Original problem and proposed solution</div>
+  <h1>The problem has not changed</h1>
+  <p class="lede">The real problem is not bad writing. It is that nobody can show, before publishing, that a piece of content matches what the organisation has actually approved.</p>
+
+  <div class="cols">
+    <div>
+      <h2 style="margin-top:0">What organisations face</h2>
+      <p>The Inkloom brief names the consequences: incorrect claims, outdated information, inconsistent language and off-brand content that damages credibility before anyone notices. Our Round 1 proposal broke this into five pains:</p>
+      <ul class="clean">
+        <li><strong>Many authors, one brand.</strong> Staff, agencies and AI writing tools each work from a different copy of the guidelines.</li>
+        <li><strong>Claims drift.</strong> A figure that was true last year keeps getting reused after it expires.</li>
+        <li><strong>Review is a bottleneck.</strong> A few reviewers check everything by hand, so they slow publishing or skim.</li>
+        <li><strong>Rules are vague.</strong> "Confident but not arrogant" means something different to each reader.</li>
+        <li><strong>No memory.</strong> Feedback lives in email and chat, so the same mistakes repeat.</li>
+      </ul>
+      <p class="small muted">These were stated in Round 1 as assumptions to test with users. We have not run those interviews yet (see section 07).</p>
+    </div>
+    <div>
+      <h2 style="margin-top:0">What we proposed in Round 1</h2>
+      <table>
+        <tr><th>Principle</th><th>Round 2 status</th></tr>
+        <tr><td><strong>No citation, no flag.</strong> AI findings must quote a rule or fact; code verifies the quote.</td><td><span class="chip s-built">BUILT</span></td></tr>
+        <tr><td><strong>Rules first, AI second.</strong> Deterministic checks run before the model.</td><td><span class="chip s-part">PARTIAL</span><br><span class="small muted">banned terms only</span></td></tr>
+        <tr><td><strong>Claims Ledger.</strong> Every claim matched against approved facts with owners and validity dates.</td><td><span class="chip s-built">BUILT</span></td></tr>
+        <tr><td><strong>Humans decide.</strong> AI cannot approve; overrides need a recorded reason.</td><td><span class="chip s-built">BUILT</span></td></tr>
+        <tr><td><strong>Guideline Gap Radar.</strong> Learn which rules confuse people from dismissed findings.</td><td><span class="chip s-def">DEFERRED</span><br><span class="small muted">reasons stored</span></td></tr>
+        <tr><td><strong>Mixed formats.</strong> Text, DOCX, PDF and images.</td><td><span class="chip s-def">DEFERRED</span><br><span class="small muted">text only</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note">
+    <h3>What stayed fixed</h3>
+    The product identity and its core rule are unchanged from Round 1: Canon advises and humans decide. A model can propose a finding, but only code decides whether the finding is shown as verified, whether it blocks approval, and what status a claim receives.
+  </div>
+
+  <div class="foot"><span>01 · Original problem and proposed solution</span><b>03</b></div>
+</section>
+
+<!-- 4 · WHAT CANON DOES -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>02 · What Canon does</span></div>
+  <div class="kicker">02 · What Canon actually does</div>
+  <h1>One draft, checked against what you approved</h1>
+  <p class="lede">A Brand Manager keeps the workspace's rules and approved facts. A Creator submits a draft. Canon produces an audit report in which every issue points to the exact rule or fact it relies on, and a Reviewer decides.</p>
+
+  <figure>
+    <img src="img/report.jpg" alt="Canon audit report for the Q4 LinkedIn launch post, showing the draft with highlighted spans and a list of findings with cited facts">
+    <figcaption><b>Audit report, live deployment.</b> The draft (left) is highlighted at the exact spans code located. Each finding (right) shows the cited fact or rule as stored in Canon's database, its owner and validity, whether code verified the quotes, and the reviewer's decision with its reason. The amber banner marks the run as DEMO/MOCK.</figcaption>
+  </figure>
+
+  <div class="cols" style="margin-top:6mm">
+    <div>
+      <h3>What a report contains</h3>
+      <ul class="clean">
+        <li>Findings ranked <strong>Blocking</strong>, <strong>Advisory</strong> or <strong>Needs human judgement</strong>. Severity comes from the rule row in our database, never from the model.</li>
+        <li>The cited source text, quoted from Canon's database, not from model output.</li>
+        <li>A minimal suggested fix (<code>replace → with</code>) the Creator can accept or reject with a reason.</li>
+        <li>Every claim in the draft with its ledger status and the reason code gave.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What a report does not claim</h3>
+      <ul class="clean">
+        <li><strong>"Supported" means "matches the approved register"</strong>, not "true in the world". Canon does not look anything up outside the workspace.</li>
+        <li>A finding whose citation fails a check is never silently dropped and never blocks. It is shown as <em>Needs human judgement</em>.</li>
+        <li>The report states which provider ran (DEMO/MOCK or Claude), the prompt version, the run time and how many AI findings were verified.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot"><span>02 · What Canon actually does</span><b>04</b></div>
+</section>
+
+<!-- 5 · FEATURES + ROLES -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>03 · Implemented features</span></div>
+  <div class="kicker">03 · Implemented features</div>
+  <h1>What is built</h1>
+  <p class="lede" style="margin-bottom:3mm">Everything below is implemented and running on the live deployment against Supabase.</p>
+
+  <table class="dense">
+    <tr><th style="width:23%">Capability</th><th>What it does</th><th style="width:25%">Where</th></tr>
+    <tr><td class="k">Role-based access</td><td>Creator, Reviewer and Brand Manager per workspace. Permissions are enforced by Postgres RLS and state-change functions, not only in the UI.</td><td class="c">0001_init.sql<br>0003_security_hardening.sql</td></tr>
+    <tr><td class="k">Brand Manager dashboard</td><td>Content and approvals, items awaiting review, rules (blocking count), facts (expiring and expired), recent content and activity.</td><td class="c">app/(app)/page.tsx</td></tr>
+    <tr><td class="k">Content submission</td><td>Pasted text with title, channel, audience, one-line goal, planned publish date and an assigned reviewer (never yourself). Revisions create a new version.</td><td class="c">submissions/new, [id]/revise-form</td></tr>
+    <tr><td class="k">Brand rules</td><td>Rule code, text, category, severity, AI or code check, banned term and replacement, source reference. Editing creates a new version.</td><td class="c">brand-kit/rules</td></tr>
+    <tr><td class="k">Approved facts</td><td>Fact text, numeric value and tolerance, valid-from and valid-until dates, replaced-by, owner, source. Confidential facts are hidden from Creators and never sent to the AI.</td><td class="c">brand-kit/facts<br>0004_confidential_facts.sql</td></tr>
+    <tr><td class="k">AI-assisted analysis</td><td>One structured call per run with a JSON schema restricted to the rule and fact codes sent. Output is validated with Zod and retried once if malformed. Production uses the DEMO/MOCK provider.</td><td class="c">lib/ai.ts, lib/ai.mock.ts</td></tr>
+    <tr><td class="k">Deterministic code checks</td><td>Whole-word, case-insensitive banned-term matching at exact offsets, with suggested replacement.</td><td class="c">lib/codechecks.ts</td></tr>
+    <tr><td class="k">Evidence verification</td><td>Four code checks on every AI citation. Failing findings become <em>Needs human judgement</em> and do not block.</td><td class="c">lib/verifier.ts</td></tr>
+    <tr><td class="k">Findings and explanations</td><td>Cards with cited source, owner and validity, explanation, suggested fix and "Why was this raised?".</td><td class="c">submissions/[id]/page.tsx</td></tr>
+    <tr><td class="k">Claims Ledger</td><td>Every objective claim gets SUPPORTED, CONTRADICTED, OUTDATED, UNSUPPORTED or HUMAN_JUDGEMENT. Numbers are compared by code. Contradicted, outdated and unsupported claims block approval.</td><td class="c">lib/ledger.ts, claims/page.tsx</td></tr>
+    <tr><td class="k">Reviewer workflow</td><td>Review queue; override a blocking finding with a reason; approve, request changes or reject. A trigger blocks self-approval and approval while unresolved blocking findings remain.</td><td class="c">review/, decide_item, check_approval</td></tr>
+    <tr><td class="k">Audit history</td><td>Append-only log of creation, revisions, runs, submissions, overrides and decisions; triggers reject edits.</td><td class="c">audit/page.tsx, audit_log</td></tr>
+    <tr><td class="k">Cost and failure guards</td><td>Daily workspace token budget (HTTP 429 when used up), reuse of an identical finished run, timeouts and retries, code-checks-only fallback with a note when AI fails.</td><td class="c">api/items/[id]/analyze</td></tr>
+  </table>
+
+  <div class="foot"><span>03 · Implemented features</span><b>05</b></div>
+</section>
+
+<!-- 6 · ROLES + SCREENS -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>03 · Roles and screens</span></div>
+  <div class="kicker">03 · Implemented features, continued</div>
+  <h1>Who can do what</h1>
+
+  <table style="margin-bottom:6mm">
+    <tr><th style="width:34%">Action</th><th>Creator</th><th>Reviewer</th><th>Brand Manager</th></tr>
+    <tr><td>Submit, revise and run checks on own content</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Accept or reject a finding on own content</td><td>Yes, reason required to reject</td><td>—</td><td>—</td></tr>
+    <tr><td>Override a blocking finding</td><td>No</td><td>Yes, reason required, not on own content</td><td>Yes, same conditions</td></tr>
+    <tr><td>Approve, request changes, reject</td><td>No</td><td>Yes, never own content</td><td>Yes, never own content</td></tr>
+    <tr><td>Edit rules and approved facts</td><td>No</td><td>No</td><td>Yes</td></tr>
+    <tr><td>See confidential facts</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Add workspace members</td><td>No</td><td>No</td><td>Yes</td></tr>
+  </table>
+
+  <div class="cols" style="gap:5mm">
+    <figure><img src="img/dashboard.jpg" alt="Brand Manager dashboard"><figcaption><b>Brand Manager dashboard.</b> Content, reviews, rules and facts at a glance, with recent content and activity.</figcaption></figure>
+    <figure><img src="img/brand-kit.jpg" alt="Brand Kit rules table"><figcaption><b>Brand Kit.</b> Versioned rules with category, check type (AI or code) and severity, each with its source.</figcaption></figure>
+    <figure><img src="img/claims-ledger.jpg" alt="Claims Ledger table with statuses"><figcaption><b>Claims Ledger.</b> Every recorded claim, the fact it was matched against, the status and the reason code gave.</figcaption></figure>
+    <figure><img src="img/audit.jpg" alt="Append-only audit history"><figcaption><b>Audit history.</b> Append-only: who did what, to which item, and when.</figcaption></figure>
+  </div>
+  <p class="small muted" style="margin-top:3mm">Screenshots taken from the live deployment on 11 Nov 2026, signed in as the demo Brand Manager of the fictional "Canon Demo Co." workspace. Items marked [E2E] were created by our end-to-end permission checks.</p>
+
+  <div class="foot"><span>03 · Implemented features</span><b>06</b></div>
+</section>
+
+<!-- 7 · ARCHITECTURE -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>04 · Architecture</span></div>
+  <div class="kicker">04 · System architecture</div>
+  <h1>Three layers, one source of truth</h1>
+  <p class="lede">The browser renders. The Next.js server orchestrates and runs the pure checking code. Postgres holds the data and enforces who may change what.</p>
+
+  <svg viewBox="0 0 640 330" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Segoe UI, sans-serif" style="margin:2mm 0 4mm">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5F6661"/></marker></defs>
+    <!-- column labels -->
+    <g font-family="JetBrains Mono, Consolas, monospace" font-size="8" letter-spacing="1" fill="#5F6661">
+      <text x="10" y="14">BROWSER</text><text x="170" y="14">VERCEL · NEXT.JS 15 SERVER</text><text x="470" y="14">SUPABASE</text>
+    </g>
+    <!-- browser -->
+    <rect x="10" y="24" width="130" height="296" rx="4" fill="#fff" stroke="#E3E0D8"/>
+    <text x="22" y="48" font-size="11" font-weight="600" fill="#1C2321">React UI</text>
+    <text x="22" y="64" font-size="8.5" fill="#5F6661">Server-rendered pages</text>
+    <g font-size="8.5" fill="#2E3532">
+      <text x="22" y="92">Overview dashboard</text><text x="22" y="108">Submissions</text><text x="22" y="124">Brand Kit</text>
+      <text x="22" y="140">Audit report</text><text x="22" y="156">Claims Ledger</text><text x="22" y="172">Review queue</text><text x="22" y="188">Audit history</text>
+    </g>
+    <line x1="22" y1="206" x2="128" y2="206" stroke="#E3E0D8"/>
+    <text x="22" y="224" font-size="8.5" fill="#5F6661">No secrets in the</text><text x="22" y="236" font-size="8.5" fill="#5F6661">browser. Demo sign-in</text><text x="22" y="248" font-size="8.5" fill="#5F6661">passwords stay on</text><text x="22" y="260" font-size="8.5" fill="#5F6661">the server.</text>
+    <!-- server -->
+    <rect x="170" y="24" width="270" height="296" rx="4" fill="#fff" stroke="#E3E0D8"/>
+    <rect x="182" y="36" width="246" height="38" rx="3" fill="#F2F0EA"/>
+    <text x="192" y="52" font-size="9.5" font-weight="600" fill="#1C2321">Middleware · session check</text>
+    <text x="192" y="66" font-size="8" fill="#5F6661">Redirects signed-out users to /login</text>
+    <rect x="182" y="82" width="118" height="54" rx="3" fill="#F2F0EA"/>
+    <text x="192" y="98" font-size="9.5" font-weight="600" fill="#1C2321">Server actions</text>
+    <text x="192" y="112" font-size="8" fill="#5F6661">create, revise, decide,</text><text x="192" y="124" font-size="8" fill="#5F6661">rules and facts</text>
+    <rect x="310" y="82" width="118" height="54" rx="3" fill="#F2F0EA"/>
+    <text x="320" y="98" font-size="9.5" font-weight="600" fill="#1C2321">API route</text>
+    <text x="320" y="112" font-size="8" font-family="JetBrains Mono, monospace" fill="#5F6661">POST /api/items</text><text x="320" y="124" font-size="8" font-family="JetBrains Mono, monospace" fill="#5F6661">/:id/analyze</text>
+    <!-- pipeline -->
+    <rect x="182" y="146" width="246" height="164" rx="3" fill="#E6EFEB" stroke="#28645A" stroke-width="1"/>
+    <text x="192" y="163" font-family="JetBrains Mono, monospace" font-size="7.5" letter-spacing="1" fill="#28645A">ANALYSIS PIPELINE · lib/pipeline.ts</text>
+    <g font-size="8.5" fill="#1C2321">
+      <rect x="192" y="172" width="226" height="20" rx="2" fill="#fff"/><text x="200" y="185"><tspan font-weight="600">1</tspan>  Code checks · banned terms</text>
+    <rect x="192" y="196" width="226" height="20" rx="2" fill="#fff"/><text x="200" y="209"><tspan font-weight="600">2</tspan>  AI client · MOCK or Claude Sonnet 5.5</text>
+      <rect x="192" y="220" width="226" height="20" rx="2" fill="#fff"/><text x="200" y="233"><tspan font-weight="600">3</tspan>  Zod output validation</text>
+      <rect x="192" y="244" width="226" height="20" rx="2" fill="#fff"/><text x="200" y="257"><tspan font-weight="600">4</tspan>  Evidence verifier · 4 checks</text>
+      <rect x="192" y="268" width="226" height="20" rx="2" fill="#fff"/><text x="200" y="281"><tspan font-weight="600">5</tspan>  Claims Ledger · status ladder</text>
+    </g>
+    <text x="192" y="302" font-size="7.5" fill="#28645A">Steps 3–5 are pure code with unit tests</text>
+    <!-- supabase -->
+    <rect x="470" y="24" width="160" height="296" rx="4" fill="#fff" stroke="#E3E0D8"/>
+    <rect x="482" y="36" width="136" height="38" rx="3" fill="#F2F0EA"/>
+    <text x="492" y="52" font-size="9.5" font-weight="600" fill="#1C2321">Supabase Auth</text><text x="492" y="66" font-size="8" fill="#5F6661">email + password</text>
+    <rect x="482" y="82" width="136" height="228" rx="3" fill="#F2F0EA"/>
+    <text x="492" y="98" font-size="9.5" font-weight="600" fill="#1C2321">PostgreSQL</text>
+    <g font-size="8" fill="#2E3532">
+      <text x="492" y="116">Row Level Security on</text><text x="492" y="128">every table</text>
+      <text x="492" y="148">State-change functions</text><text x="492" y="160">create · revise · submit ·</text><text x="492" y="172">decide_finding · decide_item</text>
+      <text x="492" y="192">Approval guard trigger</text>
+      <text x="492" y="212">Append-only triggers on</text><text x="492" y="224">audit_log, approvals,</text><text x="492" y="236">finding_decisions</text>
+      <text x="492" y="256">Workspaces, rules, facts,</text><text x="492" y="268">items, versions, runs,</text><text x="492" y="280">findings, claims</text>
+    </g>
+    <!-- arrows -->
+    <line x1="140" y1="105" x2="180" y2="105" stroke="#5F6661" marker-end="url(#ar)"/>
+    <line x1="430" y1="55" x2="480" y2="55" stroke="#5F6661" marker-end="url(#ar)"/>
+    <line x1="300" y1="109" x2="300" y2="109"/>
+    <line x1="430" y1="110" x2="480" y2="110" stroke="#5F6661" marker-end="url(#ar)"/>
+    <text x="434" y="104" font-size="7" fill="#5F6661">user JWT</text>
+    <line x1="430" y1="228" x2="480" y2="228" stroke="#28645A" marker-end="url(#ar)"/>
+    <text x="434" y="222" font-size="7" fill="#28645A">service</text><text x="434" y="242" font-size="7" fill="#28645A">writes</text>
+    <line x1="369" y1="136" x2="369" y2="144" stroke="#5F6661" marker-end="url(#ar)"/>
+  </svg>
+
+  <div class="cols">
+    <div>
+      <h3>How a request is trusted</h3>
+      <ul class="clean">
+        <li>Pages and server actions use a <strong>user-scoped Supabase client</strong>, so every read and write is filtered by RLS for that user.</li>
+        <li>Status never changes by a direct update. Clients call <strong>Postgres functions</strong> that check role and ownership first.</li>
+        <li>The analyze route reads the item and Brand Kit through the user's client, so a non-member gets 404. Only the final result rows are written with the service role.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>How the AI is contained</h3>
+      <ul class="clean">
+        <li>The AI client is chosen by environment: <code>CANON_AI_MOCK=1</code> selects the deterministic mock, otherwise the Anthropic client runs when an API key is present, and code checks alone run when neither is set.</li>
+        <li>The model only proposes. Draft text, rules and facts are sent as data inside tags, with an instruction never to follow text inside them.</li>
+        <li>Confidential facts are dropped in the database query and again when the prompt is built.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot"><span>04 · System architecture</span><b>07</b></div>
+</section>
+
+<!-- 8 · TECH STACK -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>04 · Technology stack</span></div>
+  <div class="kicker">04 · Technology stack</div>
+  <h1>A small stack, chosen for a 72-hour build</h1>
+  <p class="lede">Managed services for auth, database and hosting, so the team's time went into the product logic: the verifier, the ledger and the permission model.</p>
+
+  <table>
+    <tr><th style="width:24%">Layer</th><th style="width:30%">Technology</th><th>How Canon uses it</th></tr>
+    <tr><td class="k">Framework</td><td>Next.js 15 (App Router), React 19, TypeScript</td><td>Server-rendered pages, server actions for mutations, middleware for session checks, one API route for analysis.</td></tr>
+    <tr><td class="k">Styling</td><td>Tailwind CSS 4</td><td>One shared component file (<code>components/ui.tsx</code>) for cards, badges, tables and empty states.</td></tr>
+    <tr><td class="k">Database</td><td>Supabase PostgreSQL</td><td>Thirteen tables, four migrations. RLS on every table, <code>SECURITY DEFINER</code> state functions with a fixed <code>search_path</code>, guard and append-only triggers.</td></tr>
+    <tr><td class="k">Authentication</td><td>Supabase Auth via <code>@supabase/ssr</code></td><td>Email and password with cookie sessions. One-click demo accounts for judges; their passwords are read on the server and never sent to the browser.</td></tr>
+    <tr><td class="k">API</td><td>Next.js route handler</td><td><code>POST /api/items/:id/analyze</code>: validates the id, checks membership through RLS, enforces the daily token budget, runs the pipeline, stores the run.</td></tr>
+    <tr><td class="k">AI provider</td><td>Configurable: DEMO/MOCK or Anthropic SDK (Claude Sonnet 5.5)</td><td>Structured JSON output restricted to the IDs sent. <strong>Production currently runs DEMO/MOCK.</strong></td></tr>
+    <tr><td class="k">Validation</td><td>Zod 4</td><td>Model output schema (bounded arrays, enum categories, clamped confidence) and all form and route inputs.</td></tr>
+    <tr><td class="k">Verification</td><td>Plain TypeScript, no AI</td><td><code>verifier.ts</code> (citation checks with Unicode normalisation and offset mapping) and <code>ledger.ts</code> (status ladder, number parsing and comparison, validity dates).</td></tr>
+    <tr><td class="k">Testing</td><td>Vitest, SQL test script, Node E2E script</td><td>Unit tests for verifier, ledger, pipeline, mock, Brand Kit, middleware, actions and the analyze route; live RLS tests when credentials are present; SQL permission tests that roll back.</td></tr>
+    <tr><td class="k">Hosting</td><td>Vercel</td><td>Production deployment at canon-rose.vercel.app, built from the GitHub repository.</td></tr>
+  </table>
+
+  <h2 style="margin-top:4.5mm">Security decisions worth checking</h2>
+  <div class="cols">
+    <ul class="clean">
+      <li><strong>No self-approval.</strong> A trigger on <code>approvals</code> rejects an approval by the author, by a non-reviewer, or while verified blocking findings are not overridden.</li>
+      <li><strong>No silent history edits.</strong> <code>audit_log</code>, <code>approvals</code> and <code>finding_decisions</code> reject every update and delete.</li>
+    </ul>
+    <ul class="clean">
+      <li><strong>No cross-workspace leaks.</strong> A hardening pass (<code>0003</code>) fixed a function that exposed blocking counts across workspaces; it now returns nothing to non-members.</li>
+      <li><strong>Frozen results.</strong> Checks cannot be re-run while an item is in review, so the evidence a reviewer approves is the evidence they saw.</li>
+    </ul>
+  </div>
+
+  <div class="foot"><span>04 · Technology stack</span><b>08</b></div>
+</section>
+
+<!-- 9 · WORKFLOW -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>05 · Workflow</span></div>
+  <div class="kicker">05 · Core content-to-review workflow</div>
+  <h1>From draft to decision</h1>
+  <p class="lede">Analysis runs synchronously in one request. A Creator sees the report in about a second in mock mode, fixes what they can, and submits. Nothing reaches approval with an unresolved blocking finding.</p>
+
+  <svg viewBox="0 0 640 150" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Segoe UI, sans-serif" style="margin:1mm 0 5mm">
+    <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5F6661"/></marker></defs>
+    <g font-family="JetBrains Mono, monospace" font-size="7.5" letter-spacing="1" fill="#5F6661"><text x="0" y="10">CREATOR</text><text x="268" y="10">CANON (CODE + AI)</text><text x="532" y="10">REVIEWER</text></g>
+    <g font-size="9" fill="#1C2321">
+      <rect x="0" y="20" width="92" height="50" rx="3" fill="#fff" stroke="#E3E0D8"/><text x="9" y="40" font-weight="600">1 Submit</text><text x="9" y="56" font-size="7.8" fill="#5F6661">text, goal, date,</text><text x="9" y="66" font-size="7.8" fill="#5F6661">reviewer</text>
+      <rect x="108" y="20" width="92" height="50" rx="3" fill="#fff" stroke="#E3E0D8"/><text x="117" y="40" font-weight="600">2 Run checks</text><text x="117" y="56" font-size="7.8" fill="#5F6661">POST /analyze</text>
+      <rect x="216" y="20" width="200" height="50" rx="3" fill="#E6EFEB" stroke="#28645A"/><text x="225" y="40" font-weight="600">3 Analyse</text><text x="225" y="56" font-size="7.8" fill="#1E4D45">code checks → AI → Zod →</text><text x="225" y="66" font-size="7.8" fill="#1E4D45">verifier → Claims Ledger</text>
+      <rect x="432" y="20" width="92" height="50" rx="3" fill="#fff" stroke="#E3E0D8"/><text x="441" y="40" font-weight="600">4 Fix</text><text x="441" y="56" font-size="7.8" fill="#5F6661">accept / reject,</text><text x="441" y="66" font-size="7.8" fill="#5F6661">revise → v2</text>
+      <rect x="540" y="20" width="100" height="50" rx="3" fill="#fff" stroke="#E3E0D8"/><text x="549" y="40" font-weight="600">5 Submit</text><text x="549" y="56" font-size="7.8" fill="#5F6661">needs a finished</text><text x="549" y="66" font-size="7.8" fill="#5F6661">run on this version</text>
+      <rect x="432" y="96" width="208" height="50" rx="3" fill="#fff" stroke="#1C2321"/><text x="441" y="116" font-weight="600">6 Review</text><text x="441" y="132" font-size="7.8" fill="#5F6661">override with reason · approve ·</text><text x="441" y="142" font-size="7.8" fill="#5F6661">request changes · reject</text>
+      <rect x="216" y="96" width="200" height="50" rx="3" fill="#F2F0EA"/><text x="225" y="116" font-weight="600">Audit log</text><text x="225" y="132" font-size="7.8" fill="#5F6661">every step above is recorded,</text><text x="225" y="142" font-size="7.8" fill="#5F6661">append-only</text>
+    </g>
+    <g stroke="#5F6661" fill="none">
+      <line x1="92" y1="45" x2="106" y2="45" marker-end="url(#a2)"/><line x1="200" y1="45" x2="214" y2="45" marker-end="url(#a2)"/>
+      <line x1="416" y1="45" x2="430" y2="45" marker-end="url(#a2)"/><line x1="524" y1="45" x2="538" y2="45" marker-end="url(#a2)"/>
+      <line x1="590" y1="70" x2="590" y2="94" marker-end="url(#a2)"/>
+      <path d="M478 96 L478 82 L478 72" marker-end="url(#a2)" stroke-dasharray="3 2"/>
+      <line x1="432" y1="121" x2="418" y2="121" marker-end="url(#a2)" stroke-dasharray="3 2"/>
+    </g>
+    <text x="482" y="89" font-size="7" fill="#5F6661">changes requested</text>
+  </svg>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:19%">Step</th><th>What happens</th><th style="width:20%">Item status</th></tr>
+    <tr><td>1</td><td class="k">Submit</td><td>Creator pastes text and sets channel, audience, goal, publish date and reviewer. <code>create_item</code> stores version 1 and refuses the author as reviewer.</td><td>draft</td></tr>
+    <tr><td>2</td><td class="k">Run checks</td><td>The route checks membership and budget. If an identical finished run exists for this version, prompt and model, it is reused at no cost.</td><td>draft</td></tr>
+    <tr><td>3</td><td class="k">Analyse</td><td>Banned-term checks run in code. The AI client returns findings and claims; Zod validates the shape; the verifier checks each citation; the ledger decides each claim. Unsupported, contradicted and outdated claims become blocking findings that cite the fact (or rule CLAIM-02).</td><td>draft</td></tr>
+    <tr><td>4</td><td class="k">Fix</td><td>Creator accepts a suggested fix, rejects it with a reason, or revises the text. A revision creates a new version that needs a fresh run.</td><td>draft</td></tr>
+    <tr><td>5</td><td class="k">Submit for review</td><td><code>submit_for_review</code> requires an assigned reviewer and a finished run on the current version. Results are now frozen.</td><td>in review</td></tr>
+    <tr><td>6</td><td class="k">Review</td><td>Reviewer overrides blocking findings with a recorded reason, then approves, requests changes or rejects. The approval trigger refuses self-approval and approval with open blocking findings.</td><td>approved · changes requested · rejected</td></tr>
+  </table>
+
+  <div class="foot"><span>05 · Core workflow</span><b>09</b></div>
+</section>
+
+<!-- 10 · VERIFIER + LEDGER -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>05 · Evidence verification</span></div>
+  <div class="kicker">05 · Core workflow, continued</div>
+  <h1>How code decides what counts as evidence</h1>
+
+  <div class="cols">
+    <div>
+      <h2 style="margin-top:0">Evidence verifier: four checks</h2>
+      <p>Every AI finding names a source ID and two quotes. It is shown as verified only if all four pass.</p>
+      <table>
+        <tr><th>Check</th><th>Passes when</th></tr>
+        <tr><td class="k">ID is current</td><td>The cited rule or fact is one of those sent in this request, at its current version.</td></tr>
+        <tr><td class="k">Quote in source</td><td>The source quote is an exact substring of the stored rule or fact, after normalisation, and at least 12 characters (or the whole text).</td></tr>
+        <tr><td class="k">Words in draft</td><td>The draft quote is an exact substring of this version. Code, not the model, finds the character offsets.</td></tr>
+        <tr><td class="k">Type fits</td><td>The finding's category matches the rule's category. A tone finding cannot cite a terminology rule.</td></tr>
+      </table>
+      <p class="small muted" style="margin-top:2mm">Normalisation: Unicode NFKC, lower case, curly quotes and dashes mapped, whitespace collapsed, with a map back to original offsets so highlights land on the original text.</p>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Claims Ledger: status ladder</h2>
+      <p>Each objective claim is decided in this order; the first match wins. Opinions are not ledgered and are left to tone rules.</p>
+      <table>
+        <tr><th style="width:38%">Status</th><th>When</th></tr>
+        <tr><td><span class="chip s-hj">HUMAN_JUDGEMENT</span></td><td>The AI cited an unknown fact, its quote is not in the fact, or code's number comparison disagrees with the AI's label.</td></tr>
+        <tr><td><span class="chip s-con">CONTRADICTED</span></td><td>A fact valid on the publish date makes the claim false.</td></tr>
+        <tr><td><span class="chip s-sup">SUPPORTED</span></td><td>A fact valid on the publish date makes the claim true.</td></tr>
+        <tr><td><span class="chip s-out">OUTDATED</span></td><td>The only related facts are expired, not yet valid, or replaced.</td></tr>
+        <tr><td><span class="chip s-uns">UNSUPPORTED</span></td><td>No approved fact relates to the claim.</td></tr>
+      </table>
+      <p class="small muted" style="margin-top:2mm">Numbers are parsed by code ("more than 5,000", "10k", "1.2 million") and compared with the fact's value and tolerance. Validity is checked on the planned publish date, not the day of the check.</p>
+    </div>
+  </div>
+
+  <h2>Worked example from the live demo</h2>
+  <table>
+    <tr><th style="width:34%">Claim in the draft</th><th style="width:20%">Status</th><th>Reason recorded by code</th></tr>
+    <tr><td>"serves more than 5,000 customers"</td><td><span class="chip s-con">CONTRADICTED</span></td><td>Conflicts with FACT-1: "Canon Demo Co. serves 1,200 customers."</td></tr>
+    <tr><td>"Trusted by over 1,000 customers"</td><td><span class="chip s-sup">SUPPORTED</span></td><td>Matches FACT-1, valid on 2026-12-01</td></tr>
+    <tr><td>"Rated 4.8 out of 5 by customers"</td><td><span class="chip s-out">OUTDATED</span></td><td>FACT-2 is not valid on 2026-12-01 (valid 1 Jul 2025 to 30 Jun 2026)</td></tr>
+    <tr><td>"the fastest-growing platform in India"</td><td><span class="chip s-uns">UNSUPPORTED</span></td><td>No approved fact supports this claim; cites rule CLAIM-02</td></tr>
+    <tr><td>"now available in 12 countries"</td><td><span class="chip s-hj">HUMAN_JUDGEMENT</span></td><td>Quote not found in FACT-3</td></tr>
+  </table>
+
+  <div class="note warn" style="margin-top:5mm">
+    <h3>Why the mock still proves something</h3>
+    The mock response is fixed, but it is not pre-decided. It contains claims with candidate facts and one deliberately wrong quote. The statuses above were computed by the real verifier and ledger against the real Brand Kit in Supabase. Change a fact's validity date and the status changes. What the mock does not prove is how well a live model extracts claims from arbitrary text.
+  </div>
+
+  <div class="foot"><span>05 · Evidence verification</span><b>10</b></div>
+</section>
+
+<!-- 11 · CHANGES FROM ROUND 1 -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>06 · Changes from Round 1</span></div>
+  <div class="kicker">06 · Changes from the Round 1 proposal</div>
+  <h1>A text-first MVP, on purpose</h1>
+  <p class="lede">Round 1 planned for a 10 to 14 day build. The actual window was 72 hours (8 to 11 November 2026). We kept the parts that make Canon different, synchronous analysis, deterministic evidence verification and human review, and deferred everything that was not on that path.</p>
+
+  <table>
+    <tr><th style="width:27%">Round 1 plan</th><th style="width:27%">Round 2 build</th><th>Reason</th></tr>
+    <tr><td>Text, DOCX, PDF and image uploads</td><td>Pasted text only</td><td>Parsing formats adds failure modes before the core check is proven. Text exercises the full verifier and ledger.</td></tr>
+    <tr><td>Two AI calls: Haiku for extraction, Sonnet for claim relations</td><td>One Sonnet call returns findings and claims with candidate facts</td><td>Halves latency and failure points. Code still decides every status, so a single call loses no control.</td></tr>
+    <tr><td>Job table, background runner, <code>SKIP LOCKED</code> queue</td><td>Synchronous route handler</td><td>One call fits inside a request. A queue would add moving parts with no user benefit at this size.</td></tr>
+    <tr><td>pgvector retrieval of relevant facts</td><td>All current non-confidential facts sent</td><td>The demo kit has a handful of facts and fits in one prompt. Retrieval becomes necessary at a few hundred facts.</td></tr>
+    <tr><td>Code checks for terms, colour, contrast, alt text, reading level</td><td>Banned terms only</td><td>Colour, contrast and alt text need images. Banned terms prove the "rules first" path end to end.</td></tr>
+    <tr><td>Asset library, AI import of a PDF style guide</td><td>Manual rule and fact entry</td><td>Not needed to demonstrate a cited review.</td></tr>
+    <tr><td>Guideline Gap Radar</td><td>Reasons stored per rule; no analysis yet</td><td>The Radar learns from dismissed findings, so it needs real review data first.</td></tr>
+    <tr><td>Magic-link sign-in</td><td>Email and password with one-click demo accounts</td><td>Judges must be able to sign in without access to an inbox.</td></tr>
+    <tr><td>Live Claude analysis in the demo</td><td>DEMO/MOCK provider in production</td><td>The Claude integration is implemented but not enabled in production. The mock keeps the demo repeatable and free of API cost, and every mock report is labelled as such.</td></tr>
+    <tr><td>Python for offline evaluation</td><td>Not used</td><td>Nothing in the build needed it; the app is TypeScript end to end.</td></tr>
+    <tr><td>Canon Bench measurements</td><td>Not run</td><td>No benchmark numbers are reported. They remain Round 3 targets.</td></tr>
+  </table>
+
+  <div class="foot"><span>06 · Changes from Round 1</span><b>11</b></div>
+</section>
+
+<!-- 12 · LIMITATIONS -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>07 · Limitations</span></div>
+  <div class="kicker">07 · Current limitations and unfinished features</div>
+  <h1>What Canon does not do yet</h1>
+  <p class="lede">We would rather a judge read this page than discover it in the demo.</p>
+
+  <div class="cols">
+    <div>
+      <h2 style="margin-top:0">AI analysis</h2>
+      <ul class="clean">
+        <li><strong>Production uses mock analysis.</strong> No live Sonnet inference runs on the deployment. The mock only produces findings for recognised sample phrases still present in the text. Other wording gets code checks and needs manual review.</li>
+        <li><strong>Live AI is unmeasured.</strong> We have no precision, recall or consistency figures for a real model. Canon Bench was not run.</li>
+        <li><strong>No split for long drafts.</strong> If the output is cut off, the run falls back to code checks with a note.</li>
+      </ul>
+      <h2>Inputs and checks</h2>
+      <ul class="clean">
+        <li><strong>Text only.</strong> No DOCX, PDF, image or creative analysis.</li>
+        <li><strong>One kind of code check.</strong> Banned terms only; no contrast, palette, alt text or reading level.</li>
+        <li><strong>No external facts.</strong> Canon checks claims only against the workspace's own approved register. It does not retrieve or verify anything from outside sources.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Product</h2>
+      <ul class="clean">
+        <li><strong>No Guideline Gap Radar.</strong> Override and rejection reasons are stored per rule, but nothing analyses them yet.</li>
+        <li><strong>No insights page.</strong> The dashboard shows counts, not trends.</li>
+        <li><strong>No item-level confidential mode.</strong> Confidential facts are protected; a whole draft cannot yet be marked as code-checks only.</li>
+        <li><strong>Members must already have an account.</strong> There is no invitation or sign-up flow.</li>
+        <li><strong>No notifications or integrations.</strong> Reviewers find work in the queue.</li>
+      </ul>
+      <h2>Evidence and process</h2>
+      <ul class="clean">
+        <li><strong>No user research yet.</strong> The interviews and survey planned in Round 1 have not been run, so the problem hypotheses remain assumptions.</li>
+        <li><strong>Synchronous only.</strong> Fine for one call; a slower model or larger kit would need a background job.</li>
+        <li><strong>Demo data is fictional.</strong> "Canon Demo Co." and its rules and facts are invented for the demo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot"><span>07 · Limitations</span><b>12</b></div>
+</section>
+
+<!-- 13 · ROUND 3 -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>08 · Round 3</span></div>
+  <div class="kicker">08 · Round 3 roadmap</div>
+  <h1>Three substantial improvements</h1>
+  <p class="lede" style="margin-bottom:3mm">Each one extends the same principle into new territory: every finding cites its evidence, code verifies the citation, and a human decides.</p>
+
+  <div class="rm">
+    <div class="num">1</div>
+    <div>
+      <h3>Multimodal Brand Compliance</h3>
+      <p>Check PDF, DOCX and image or creative assets, not only pasted text.</p>
+      <div class="grid">
+        <div><div class="lab">What we build</div><ul class="clean"><li>Text and layout extraction from PDF and DOCX, mapped back to page and position.</li><li>Image and creative checks: palette against brand colours, contrast ratios, logo use, text in images.</li><li>Accessibility checks in code: contrast and alt text.</li></ul></div>
+        <div><div class="lab">How it stays trustworthy</div><ul class="clean"><li>Measurable checks (colour, contrast) run in code, not AI.</li><li>Visual findings cite a region of the asset, verified to exist, the way text findings cite a span.</li><li>Asset library in the Brand Kit for logos, palette and fonts.</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rm">
+    <div class="num">2</div>
+    <div>
+      <h3>Live Fact Verification and Source Intelligence</h3>
+      <p>Go beyond the internal register: check claims against trusted external sources and keep the register itself current.</p>
+      <div class="grid">
+        <div><div class="lab">What we build</div><ul class="clean"><li>Workspace-approved list of trusted external sources.</li><li>Source references stored with each fact and shown on each claim.</li><li>Detection of outdated or contradictory claims when a source changes, with the fact owner notified.</li></ul></div>
+        <div><div class="lab">How it stays trustworthy</div><ul class="clean"><li>A retrieved source is evidence for a human, not an automatic SUPPORTED: the ledger keeps "approved register" and "external source" apart.</li><li>Retrieval of relevant facts replaces sending the whole register, so it scales past a few hundred facts.</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rm" style="border-bottom:1px solid var(--line)">
+    <div class="num">3</div>
+    <div>
+      <h3>Continuous Brand Governance and Integrations</h3>
+      <p>Move Canon from a review step to an ongoing control across where content is written and published.</p>
+      <div class="grid">
+        <div><div class="lab">What we build</div><ul class="clean"><li>Integrations with publishing platforms, so content is checked where it is written and before it goes out.</li><li>Version-aware policies: each check records which rule and fact versions applied, and policy changes can be previewed against recent content.</li><li>Continuous monitoring: re-check published content when a fact expires or a rule changes.</li></ul></div>
+        <div><div class="lab">How it stays trustworthy</div><ul class="clean"><li>Background jobs replace the synchronous route, with retries and an audit entry per run.</li><li>The Guideline Gap Radar uses stored override reasons to show which rules people find unclear.</li><li>Humans still approve; integrations never publish on Canon's say-so.</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="small muted" style="margin-top:3mm">Round 3 also includes the reliability work Round 2 skipped: switching production to live inference behind the existing budget and fallbacks, and measuring it on Canon Bench before reporting any accuracy figure.</p>
+
+  <div class="foot"><span>08 · Round 3 roadmap</span><b>13</b></div>
+</section>
+
+<!-- 14 · TEAM + EVIDENCE + DISCLOSURES -->
+<section class="page">
+  <div class="run"><span>Canon · Round 2</span><span>Team and disclosures</span></div>
+  <div class="kicker">Team, evidence and disclosures</div>
+  <h1>Team codeX</h1>
+  <p class="muted" style="margin-bottom:4mm">CHRIST (Deemed to be University), Kengeri Campus</p>
+
+  <table>
+    <tr><th style="width:24%">Member</th><th style="width:30%">Round 1 role</th><th>Area of ownership</th></tr>
+    <tr><td class="k">Yoson Y</td><td>Frontend and Product Lead</td><td>Product interface and user experience: dashboard, Brand Kit, submission, report, ledger, review and audit screens.</td></tr>
+    <tr><td class="k">Raphael Roger A</td><td>Backend and Database Engineer</td><td>Schema and migrations, authentication, RLS, approval workflow, audit log, deployment.</td></tr>
+    <tr><td class="k">Bryan Donato Anand</td><td>AI and Machine Learning Engineer</td><td>AI integration and prompt, evidence verifier, Claims Ledger.</td></tr>
+    <tr><td class="k">Macario Andric</td><td>QA, Research and Documentation</td><td>Tests and end-to-end checks, research plan, documentation and submissions.</td></tr>
+  </table>
+  <p class="small muted" style="margin-top:2mm">Roles are as agreed in Round 1. Individual contributions are recorded in the repository history.</p>
+
+  <div class="cols" style="margin-top:4mm">
+    <div>
+      <h2 style="margin-top:0">How to check our claims</h2>
+      <table>
+        <tr><td class="k">Live app</td><td class="mono">canon-rose.vercel.app/login</td></tr>
+        <tr><td class="k">Repository</td><td class="mono">github.com/yo5on/Canon</td></tr>
+        <tr><td class="k">Demo sign-in</td><td>One click as Brand Manager, Reviewer or Creator of "Canon Demo Co."</td></tr>
+        <tr><td class="k">Unit tests</td><td><code>npm test</code>: 72 passed in 9 files on 11 Nov 2026</td></tr>
+        <tr><td class="k">Permission tests</td><td><code>supabase/tests/security.sql</code> and <code>scripts/e2e-api.mjs</code></td></tr>
+        <tr><td class="k">Build plan</td><td><code>docs/ROUND2_PLAN.md</code>, <code>docs/SECURITY_HARDENING.md</code></td></tr>
+      </table>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Disclosures</h2>
+      <ul class="clean">
+        <li><strong>AI analysis in production is mocked.</strong> Deployed reports come from the DEMO/MOCK provider and are labelled so. No live Claude Sonnet inference runs on the deployment.</li>
+        <li><strong>AI-assisted development.</strong> The code and this document were written with help from an AI coding assistant (Claude Code by Anthropic). Document statements were checked against the repository and the live deployment.</li>
+        <li><strong>External services.</strong> Supabase (database, auth), Vercel (hosting), GitHub (repository). The Anthropic API is integrated but not called in production.</li>
+        <li><strong>No measured accuracy.</strong> This document reports no benchmark or user-study results, because none have been run.</li>
+        <li><strong>Fictional data.</strong> All demo brands, people, rules and facts are invented.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot"><span>Team, evidence and disclosures</span><b>14</b></div>
+</section>
+
+</body>
+</html>
