@@ -20,6 +20,7 @@ export default async function AuditHistory() {
   return (
     <>
       <PageHeader
+        icon="history"
         crumb="Governance"
         title="Audit history"
         subtitle="Append-only. Nobody, including administrators, can edit or delete these entries."

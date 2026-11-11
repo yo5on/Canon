@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Icon } from "@/components/icon";
 import { notFound } from "next/navigation";
 import { Badge, CLAIM_STATUS, Card, EmptyState, PageHeader, StatusBadge, formatDate, formatDateTime, td, th, type Tone } from "@/components/ui";
 import { memberNames, requireWorkspace } from "@/lib/workspace";
@@ -87,26 +88,26 @@ function FindingCard({ f, n, fact, claimReason, decisions, p }: { f: Finding; n:
   const k = kind(f);
   const isFact = f.source_code?.startsWith("FACT-");
   return (
-    <li id={`f-${n}`} className="scroll-mt-6 px-5 py-4">
+    <li id={`f-${n}`} className="scroll-mt-6">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-xs text-faint">{n}</span>
+        <span className="text-xs font-medium text-muted">Issue {String(n).padStart(2, "0")}</span>
         <Badge tone={k.tone}>{k.label}</Badge>
-        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{f.category}</span>
+        <span className="text-[11px] capitalize text-muted">{f.category}</span>
         <span className="text-xs text-faint">
           {f.origin === "code" ? "code check" : `AI${f.confidence !== null ? ` · confidence ${f.confidence.toFixed(2)}` : ""}`}
         </span>
       </div>
 
-      <p className="mt-2 text-sm">{f.explanation}</p>
+      <p className="mt-3 text-[14px] font-medium leading-6">{f.explanation}</p>
       <p className="mt-1 text-sm text-muted">
-        In the draft: <q className="text-ink">{f.draft_quote}</q>
+        Flagged text: <q className="text-ink">{f.draft_quote}</q>
       </p>
 
-      <div className="mt-3 rounded-lg border border-line bg-canvas px-3 py-2 text-sm">
+      <div className="evidence-quote mt-4 text-[13px] leading-6">
         {f.source_text ? (
           <>
             <p>
-              <span className="font-mono text-xs text-accent">
+              <span className="font-mono text-xs text-muted">
                 {f.source_code} v{f.source_version}
               </span>{" "}
               “{f.source_text}”
@@ -299,7 +300,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
           </>
         }
         actions={
-          <div className="flex items-start gap-3">
+          <div className="flex flex-wrap items-start gap-2">
             <div className="pt-2">
               <StatusBadge status={item.status} />
             </div>
@@ -319,7 +320,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
       )}
 
       {run && rs && (
-        <Card className="mb-4 px-5 py-3 text-sm">
+        <section className="mb-5 rounded bg-secondary px-4 py-3 text-[13px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span className="label">Audit report · v{item.current_version}</span>
             <span className="text-muted">Code checks ran</span>
@@ -338,7 +339,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
             </p>
           )}
           {run.ai_note && <p className="mt-2 text-xs text-muted">{run.ai_note} Tone, messaging and claim checks did not run; a reviewer should check them by hand.</p>}
-        </Card>
+        </section>
       )}
 
       {run && (
@@ -350,52 +351,20 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
         </div>
       )}
 
-      {perms.reviewer && perms.inReview && (
-        <Card className="mb-4 px-5 py-4">
-          <h2 className="mb-2 text-sm font-medium">Reviewer decision</h2>
-          <p className="mb-3 text-xs text-muted">Approval is blocked while verified blocking findings remain; override them above with a reason, or request changes.</p>
-          <ReviewForm
-            fields={{ kind: "item", item: item.id }}
-            reason="Reason (required unless approving)"
-            choices={[
-              { value: "approved", label: "Approve", tone: "ok" },
-              { value: "changes_requested", label: "Request changes", tone: "plain" },
-              { value: "rejected", label: "Reject", tone: "danger" },
-            ]}
-          />
-        </Card>
-      )}
-      {isAuthor && perms.inReview && <p className="mb-4 text-xs text-muted">Waiting for a Reviewer. You can’t approve your own submission.</p>}
-
-      {reviews.data.length > 0 && (
-        <Card className="mb-4 px-5 py-4">
-          <h2 className="mb-3 text-sm font-medium">Review history</h2>
-          <ul className="space-y-3">
-            {reviews.data.map((review) => (
-              <li key={review.id} className="text-sm">
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusBadge status={review.decision} />
-                  <span className="text-xs text-muted">v{review.version} · {names.get(review.approver_id) ?? "Reviewer"} · {formatDateTime(review.created_at)}</span>
-                </div>
-                {review.reason && <p className="mt-1 text-sm">{review.reason}</p>}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      <div className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
-        <Card className="self-start">
-          <div className="border-b border-line px-5 py-3.5">
-            <h2 className="text-sm font-medium">Draft v{item.current_version}</h2>
+      <div className="report-layout document-section">
+        <section className="report-draft-column">
+          <div className="document-title">
+            <Icon name="file" size={18} /><h2 className="text-sm font-medium">Submitted content · v{item.current_version}</h2>
           </div>
-          <Draft body={version.body} findings={findings} />
-          {isAuthor && canRun && <ReviseForm key={version.id} itemId={item.id} body={version.body} />}
-        </Card>
+          <div className="report-draft">
+            <Draft body={version.body} findings={findings} />
+            {isAuthor && canRun && <ReviseForm key={version.id} itemId={item.id} body={version.body} />}
+          </div>
+        </section>
 
-        <Card className="self-start">
-          <div className="border-b border-line px-5 py-3.5">
-            <h2 className="text-sm font-medium">Findings</h2>
+        <section className="min-w-0">
+          <div className="document-title">
+            <Icon name="check" size={18} /><h2 className="text-sm font-medium">Detected issues</h2><span className="text-xs font-normal text-muted">{findings.length}</span>
           </div>
           {!run ? (
             <EmptyState
@@ -405,7 +374,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
           ) : findings.length === 0 ? (
             <EmptyState title="No findings recorded" body={run?.model === "mock" ? "No matching demo findings or code violations. This is not a full AI review; check other wording manually." : "The completed checks reported no findings. Claims, if any, are listed below."} />
           ) : (
-            <ol className="divide-y divide-line">
+            <ol className="report-findings">
               {findings.map((f, i) => (
                 <FindingCard
                   key={f.id}
@@ -419,7 +388,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
               ))}
             </ol>
           )}
-        </Card>
+        </section>
       </div>
 
       {claims.length > 0 && (
@@ -456,6 +425,40 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
           </table>
         </Card>
       )}
+      {perms.reviewer && perms.inReview && (
+        <section className="document-section">
+          <h2 className="mb-2 text-sm font-medium">Reviewer decision</h2>
+          <p className="mb-3 text-xs text-muted">Approval is blocked while verified blocking findings remain; override them above with a reason, or request changes.</p>
+          <ReviewForm
+            fields={{ kind: "item", item: item.id }}
+            reason="Reason (required unless approving)"
+            choices={[
+              { value: "approved", label: "Approve", tone: "ok" },
+              { value: "changes_requested", label: "Request changes", tone: "plain" },
+              { value: "rejected", label: "Reject", tone: "danger" },
+            ]}
+          />
+        </section>
+      )}
+      {isAuthor && perms.inReview && <p className="mb-4 text-xs text-muted">Waiting for a Reviewer. You can’t approve your own submission.</p>}
+
+      {reviews.data.length > 0 && (
+        <section className="document-section">
+          <h2 className="mb-3 text-sm font-medium">Review history</h2>
+          <ul className="space-y-3">
+            {reviews.data.map((review) => (
+              <li key={review.id} className="text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge status={review.decision} />
+                  <span className="text-xs text-muted">v{review.version} · {names.get(review.approver_id) ?? "Reviewer"} · {formatDateTime(review.created_at)}</span>
+                </div>
+                {review.reason && <p className="mt-1 text-sm">{review.reason}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
     </>
   );
 }

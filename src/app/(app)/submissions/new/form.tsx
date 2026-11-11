@@ -31,19 +31,19 @@ export function SubmitForm({ reviewers, today, mockDraft }: { reviewers: { id: s
   const aria = (name: string) => (e?.[name] ? { "aria-invalid": true, "aria-describedby": `${name}-error` } : {});
 
   return (
-    <form action={action} key={state.n ?? 0} className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-      <div className="rounded-xl border border-line bg-panel p-6">
+    <form action={action} key={state.n ?? 0} className="grid gap-8 xl:grid-cols-[1.6fr_1fr]">
+      <div className="min-w-0">
         <div className="grid gap-5">
           <Field label="Title" name="title" error={e?.title}>
             <input id="title" name="title" required maxLength={200} defaultValue={v.title} className="field" {...aria("title")} />
           </Field>
           <Field label="Draft text" name="body" error={e?.body} hint="Pasted text only in this release. Checked word for word.">
-            <textarea id="body" name="body" required rows={14} maxLength={40000} defaultValue={v.body ?? mockDraft ?? undefined} className="field leading-relaxed" {...aria("body")} />
+            <textarea id="body" name="body" required rows={14} maxLength={40000} defaultValue={v.body ?? mockDraft ?? undefined} className="field !bg-secondary !p-4 text-[15px] leading-7" {...aria("body")} />
           </Field>
         </div>
       </div>
 
-      <div className="rounded-xl border border-line bg-panel p-6">
+      <div className="min-w-0 border-t border-line pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-7">
         <div className="grid gap-5">
           <Field label="Channel" name="channel" error={e?.channel}>
             <select id="channel" name="channel" defaultValue={v.channel || "LinkedIn"} className="field">

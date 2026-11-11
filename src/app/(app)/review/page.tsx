@@ -22,6 +22,7 @@ export default async function ReviewQueue() {
   return (
     <>
       <PageHeader
+        icon="check"
         crumb="Review"
         title="Review queue"
         subtitle={
