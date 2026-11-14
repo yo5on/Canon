@@ -16,6 +16,7 @@ export interface Fact {
   valid_from: string | null; // ISO date
   valid_until: string | null; // ISO date
   replaced_by: string | null; // id of the newer fact, if replaced
+  source_changed?: string | null; // set when the fact's cited source was retrieved and no longer confirms it
 }
 
 export interface Candidate {
@@ -84,7 +85,7 @@ export function compareNumber(claim: { value: number; qualifier: Qualifier }, fa
 }
 
 export function isValidOn(f: Fact, date: string): boolean {
-  if (f.replaced_by) return false;
+  if (f.replaced_by || f.source_changed) return false;
   if (f.valid_from && date < f.valid_from) return false; // embargoed fact cannot support a claim yet
   if (f.valid_until && date > f.valid_until) return false;
   return true;
@@ -127,7 +128,11 @@ export function decideClaim(claim: ClaimInput, facts: Map<string, Fact>, publish
   if (sup) return { status: "SUPPORTED", fact_id: sup.fact.id, reason: `Matches ${sup.fact.id}, valid on ${publishDate}` };
   const old = related[0];
   if (old) {
-    const why = old.fact.replaced_by ? `replaced by ${old.fact.replaced_by}` : `not valid on ${publishDate}`;
+    const why = old.fact.replaced_by
+      ? `replaced by ${old.fact.replaced_by}`
+      : old.fact.source_changed
+        ? `no longer confirmed by its source: ${old.fact.source_changed}`
+        : `not valid on ${publishDate}`;
     return { status: "OUTDATED", fact_id: old.fact.id, reason: `${old.fact.id} is ${why}` };
   }
   return { status: "UNSUPPORTED", fact_id: null, reason: "No approved fact supports this claim" };

@@ -9,7 +9,7 @@ import { POST } from "./route";
 function query(data: unknown) {
   const result = { data, error: null };
   const chain: Record<string, unknown> = {};
-  for (const key of ["select", "eq", "gte", "order", "limit"]) chain[key] = () => chain;
+  for (const key of ["select", "eq", "gte", "order", "limit", "in"]) chain[key] = () => chain;
   chain.single = chain.maybeSingle = async () => result;
   chain.then = (resolve: (r: typeof result) => unknown) => Promise.resolve(result).then(resolve);
   return chain;
@@ -22,10 +22,12 @@ beforeEach(() => {
   vi.stubEnv("CANON_AI_MOCK", "1");
   client.mockResolvedValue({
     auth: { getUser: async () => ({ data: { user: { id: "creator" } } }) },
+    rpc: async () => ({ data: "policy", error: null }),
     from: (table: string) => query(({
       content_items: { id, org_id: "org", status: "draft", current_version: 1, channel: "LinkedIn", audience: "Customers", goal: "Launch", publish_date: "2026-12-15" },
       content_versions: { id: "version", body: "A campaign for our customers." },
-      analysis_runs: null, rules: [], facts: [],
+      analysis_runs: null, rules: [], facts: [], source_checks: [],
+      policy_versions: { id: "policy", version: 3, rules: [], facts: [] },
     } as Record<string, unknown>)[table]),
   });
 });
@@ -34,6 +36,7 @@ function writes(auditError: { message: string } | null) {
   removed.mockResolvedValue({ error: null });
   admin.mockReturnValue({ from: (table: string) => table === "analysis_runs" ? {
     insert: () => query({ id: "run" }),
+    select: () => query([]),
     update: () => ({ eq: async () => ({ error: null }) }),
     delete: () => ({ eq: removed }),
   } : { insert: async () => ({ error: auditError }) } });
@@ -50,7 +53,7 @@ it("returns the saved demo run when audit recording succeeds", async () => {
   writes(null);
   const response = await request();
   expect(response.status).toBe(200);
-  expect(await response.json()).toMatchObject({ run_id: "run", status: "done", claims: 0 });
+  expect(await response.json()).toMatchObject({ run_id: "run", status: "done", claims: 0, policy_version: 3 });
   expect(removed).not.toHaveBeenCalled();
 });
 it("requires authentication before reading or writing analysis", async () => {

@@ -4,6 +4,7 @@
 import type { ModelOutput } from "./ai";
 import { bannedTermHits, type CodeRule } from "./codechecks";
 import { decideClaim, isBlocking, type ClaimStatus, type Fact } from "./ledger";
+import { findClaimInPages } from "./sources";
 import { normalize, verifyFinding, type CheckName, type Source } from "./verifier";
 
 export type Severity = "blocking" | "advisory";
@@ -17,6 +18,8 @@ export interface RuleRow {
   check_kind: "ai" | "code";
   banned_term: string | null;
   replacement: string | null;
+  check_type?: string;
+  params?: Record<string, unknown> | null;
 }
 
 export interface FactRow {
@@ -29,7 +32,27 @@ export interface FactRow {
   valid_until: string | null;
   replaced_by: string | null;
   confidential: boolean;
+  source_url?: string | null;
+  source_ref?: string | null;
+  owner?: string;
 }
+
+/** Latest retrieval of a fact's cited source (source_checks row). */
+export interface SourceCheck {
+  fact_code: string;
+  fact_version: number;
+  url: string;
+  retrieved_at: string;
+  outcome: "confirmed" | "not_found" | "changed" | "unavailable" | "blocked";
+  excerpt: string | null;
+  http_status: number | null;
+  error: string | null;
+}
+
+/** Evidence copied onto a claim at run time. "register" comes from our database; "external" was retrieved by code. */
+export type Evidence =
+  | { kind: "register"; fact_code: string; fact_version: number; text: string; owner: string; source_ref: string | null; valid_from: string | null; valid_until: string | null }
+  | { kind: "external"; role: "fact_source" | "claim_mention"; url: string; retrieved_at: string; outcome: string; excerpt: string | null; http_status: number | null; error: string | null; fact_code?: string };
 
 export interface FindingRow {
   origin: "code" | "ai";
@@ -48,6 +71,7 @@ export interface FindingRow {
   fix_replace: string | null;
   fix_with: string | null;
   confidence: number | null;
+  region?: Record<string, number> | null;
 }
 
 export interface ClaimRow {
@@ -57,11 +81,18 @@ export interface ClaimRow {
   fact_code: string | null;
   reason: string;
   finding_index: number | null; // index into findings, for claims.finding_id
+  evidence: Evidence[];
+  ai_candidates: unknown; // the model's suggestion, stored apart from evidence and never shown as evidence
+}
+
+export interface AssembleOptions {
+  sourceChecks?: Map<string, SourceCheck>; // keyed by fact code, current version only
+  externalPages?: { url: string; retrieved_at: string; page_text: string }[];
 }
 
 export const aiRules = (rules: RuleRow[]) => rules.filter((r) => r.check_kind === "ai");
 
-const toLedgerFact = (f: FactRow): Fact => ({
+const toLedgerFact = (f: FactRow, check?: SourceCheck): Fact => ({
   id: f.code,
   text: f.text,
   value: f.value === null ? null : Number(f.value),
@@ -69,6 +100,8 @@ const toLedgerFact = (f: FactRow): Fact => ({
   valid_from: f.valid_from,
   valid_until: f.valid_until,
   replaced_by: f.replaced_by,
+  // Only a page that confirmed the fact before and no longer does retires it. An unreachable source changes nothing.
+  source_changed: check?.outcome === "changed" ? `${check.url} (retrieved ${check.retrieved_at.slice(0, 10)})` : null,
 });
 
 const ruleSource = (r: RuleRow): Source => ({ id: r.code, kind: "rule", version: r.version, text: r.text, category: r.category });
@@ -86,11 +119,12 @@ export function assemble(
   facts: FactRow[],
   publishDate: string,
   ai: ModelOutput | null,
+  opts: AssembleOptions = {},
 ): { findings: FindingRow[]; claims: ClaimRow[] } {
   const findings: FindingRow[] = [];
   const claims: ClaimRow[] = [];
 
-  const codeRules = rules.filter((r): r is RuleRow & CodeRule => r.check_kind === "code" && !!r.banned_term);
+  const codeRules = rules.filter((r): r is RuleRow & CodeRule => r.check_kind === "code" && (r.check_type ?? "banned_term") === "banned_term" && !!r.banned_term);
   for (const h of bannedTermHits(draft, codeRules)) {
     findings.push({
       origin: "code",
@@ -144,7 +178,12 @@ export function assemble(
   }
 
   const sendable = facts.filter((f) => !f.confidential);
-  const ledgerFacts = new Map(sendable.map((f) => [f.code, toLedgerFact(f)]));
+  const checks = opts.sourceChecks ?? new Map<string, SourceCheck>();
+  const checkFor = (f: FactRow) => {
+    const c = checks.get(f.code);
+    return c && c.fact_version === f.version ? c : undefined;
+  };
+  const ledgerFacts = new Map(sendable.map((f) => [f.code, toLedgerFact(f, checkFor(f))]));
   const factByCode = new Map(sendable.map((f) => [f.code, f]));
   const fallbackRule = claimRule(sent);
 
@@ -188,7 +227,45 @@ export function assemble(
           confidence: null,
         }) - 1;
     }
-    claims.push({ text: c.text, type: c.type, status: res.status, fact_code: res.fact_id, reason: res.reason, finding_index });
+    // Evidence is copied from our database and from pages code retrieved — never from the model.
+    const evidence: Evidence[] = [];
+    let reason = res.reason;
+    const fact = res.fact_id ? factByCode.get(res.fact_id) : undefined;
+    if (fact) {
+      evidence.push({ kind: "register", fact_code: fact.code, fact_version: fact.version, text: fact.text, owner: fact.owner ?? "", source_ref: fact.source_ref ?? null, valid_from: fact.valid_from, valid_until: fact.valid_until });
+      const chk = checkFor(fact);
+      if (chk) {
+        evidence.push({ kind: "external", role: "fact_source", url: chk.url, retrieved_at: chk.retrieved_at, outcome: chk.outcome, excerpt: chk.excerpt, http_status: chk.http_status, error: chk.error, fact_code: fact.code });
+        if (chk.outcome === "unavailable") reason += `. Source ${chk.url} could not be retrieved on ${chk.retrieved_at.slice(0, 10)}; it was not checked`;
+        if (chk.outcome === "not_found") reason += `. Note: the cited source does not state this fact (retrieved ${chk.retrieved_at.slice(0, 10)})`;
+      } else if (fact.source_url) reason += ". Its source URL has not been retrieved yet";
+    }
+    if (res.status === "UNSUPPORTED" && opts.externalPages?.length) {
+      const hit = findClaimInPages(c.text, opts.externalPages);
+      if (hit) {
+        evidence.push({ kind: "external", role: "claim_mention", url: hit.url, retrieved_at: hit.retrieved_at, outcome: "mentioned", excerpt: hit.excerpt, http_status: null, error: null });
+        reason += `. A trusted source mentions it (${hit.url}); that is evidence for a reviewer, not an approved fact`;
+      }
+    }
+    if (finding_index !== null) findings[finding_index].explanation = `Claim is ${res.status!.toLowerCase()}: ${reason}`;
+    claims.push({ text: c.text, type: c.type, status: res.status, fact_code: res.fact_id, reason, finding_index, evidence, ai_candidates: c.candidates });
   }
   return { findings, claims };
+}
+
+const FACT_WORD = /[\p{L}\p{N}][\p{L}\p{N},.]*/gu;
+const factWords = (s: string) => new Set((normalize(s).match(FACT_WORD) ?? []).map((w) => w.replace(/[,.]+$/, "")).filter((w) => w.length >= 3));
+
+/**
+ * Facts worth sending with this draft: ranked by shared words and numbers, capped at `limit`.
+ * Small registers are sent whole, so nothing changes until a kit outgrows one prompt.
+ */
+export function relevantFacts<T extends { text: string }>(draft: string, facts: T[], limit = 60): T[] {
+  if (facts.length <= limit) return facts;
+  const d = factWords(draft);
+  return facts
+    .map((f, i) => ({ f, i, score: [...factWords(f.text)].filter((w) => d.has(w)).length }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .slice(0, limit)
+    .map((x) => x.f);
 }

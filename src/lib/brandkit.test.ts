@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { factSchema, factState, fieldErrors, ruleSchema } from "./brandkit";
+import { factSchema, factState, fieldErrors, parsePalette, ruleSchema } from "./brandkit";
 
 const rule = {
   code: "tone-2",
@@ -75,5 +75,34 @@ describe("factState", () => {
     expect(factState(f("2026-12-01", null), t)).toBe("scheduled");
     expect(factState(f(null, null, "FACT-9"), t)).toBe("replaced");
     expect(factState(f(null, "2026-12-31"), t)).toBe("active");
+  });
+});
+
+describe("Round 3 rule types", () => {
+  it("stores visual check parameters on the rule row", () => {
+    const c = ruleSchema.parse({ ...rule, code: "ACC-2", category: "accessibility", check_kind: "code", check_type: "contrast", min_ratio: "4.5", banned_term: "ignored" });
+    expect(c).toMatchObject({ check_type: "contrast", params: { min_ratio: 4.5 }, banned_term: null });
+    const p = ruleSchema.parse({ ...rule, code: "BRAND-1", category: "visual", check_kind: "code", check_type: "palette", palette: "Canon Green #28645a, white #FFFFFF" });
+    expect(p.params).toMatchObject({ colors: ["#28645A", "#FFFFFF"] });
+    expect(ruleSchema.parse(rule)).toMatchObject({ check_type: "banned_term", params: {} });
+  });
+
+  it("rejects bad palettes, visual checks marked as AI and out-of-range ratios", () => {
+    const bad = (extra: object) => {
+      const r = ruleSchema.safeParse({ ...rule, check_kind: "code", ...extra });
+      return r.success ? {} : fieldErrors(r.error);
+    };
+    expect(bad({ check_type: "palette", palette: "#12 green" }).palette).toMatch(/hex/);
+    expect(bad({ check_type: "palette", palette: "" }).palette).toBeDefined();
+    expect(bad({ check_type: "contrast", min_ratio: "40" }).min_ratio).toBeDefined();
+    expect(bad({ check_kind: "ai", check_type: "alt_text" }).check_type).toBeDefined();
+    expect(parsePalette("#ABCDEF #abcdef").colors).toEqual(["#ABCDEF"]);
+  });
+
+  it("accepts only https source URLs on facts", () => {
+    expect(factSchema.parse({ ...fact, source_url: "https://example.org/report" }).source_url).toBe("https://example.org/report");
+    expect(factSchema.parse(fact).source_url).toBeNull();
+    expect(factSchema.safeParse({ ...fact, source_url: "http://example.org" }).success).toBe(false);
+    expect(factSchema.safeParse({ ...fact, source_url: "javascript:alert(1)" }).success).toBe(false);
   });
 });
