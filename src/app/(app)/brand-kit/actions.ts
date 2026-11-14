@@ -42,6 +42,7 @@ async function saveVersion(table: "rules" | "facts", id: string | null, values: 
   if (!id) {
     const { error } = await supabase.from(table).insert({ ...base, version: 1, is_current: true });
     if (error) return dbError(error.code, what);
+    await supabase.rpc("snapshot_policy", { p_org: active.orgId, p_note: `${what} ${String(values.code)} added` });
     return null;
   }
 
@@ -66,6 +67,7 @@ async function saveVersion(table: "rules" | "facts", id: string | null, values: 
   if (retire.error || retire.data.length !== 1) return { errors: { form: `Could not update the ${what}. Try again.` } };
   const promote = await supabase.from(table).update({ is_current: true }).eq("id", created.id).select("id");
   if (promote.error || promote.data.length !== 1) return { errors: { form: `Saved, but the new version isn’t live yet. Try again.` } };
+  await supabase.rpc("snapshot_policy", { p_org: active.orgId, p_note: `${what} ${old.code} v${old.version} → v${old.version + 1}` });
   return null;
 }
 

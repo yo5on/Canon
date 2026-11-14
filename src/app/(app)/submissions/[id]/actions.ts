@@ -2,7 +2,10 @@
 
 // Review workflow (ROUND2_PLAN §4). Every state change goes through the Postgres functions in 0001_init.sql,
 // called as the signed-in user: they and the approvals trigger enforce roles, "no self-approval" and the audit log.
+import { after } from "next/server";
 import { z } from "zod";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { appUrl, dispatch } from "@/lib/webhooks";
 import { requireWorkspace } from "@/lib/workspace";
 
 export type ActionState = { error?: string; ok?: boolean };
@@ -25,6 +28,7 @@ const KNOWN = [
   "run checks on the current version",
   "choose a reviewer first",
   "item is",
+  "already decided",
 ];
 
 export async function reviewAction(_prev: ActionState, form: FormData): Promise<ActionState> {
@@ -34,7 +38,7 @@ export async function reviewAction(_prev: ActionState, form: FormData): Promise<
   if ((d.kind === "finding" || d.kind === "item") && d.decision !== "accepted" && d.decision !== "approved" && d.reason.length < 3)
     return { error: "Give a reason (at least 3 characters)." };
 
-  const { supabase } = await requireWorkspace();
+  const { supabase, active } = await requireWorkspace();
   const { error } =
     d.kind === "revise"
       ? await supabase.rpc("revise_item", { p_item: d.item, p_body: d.body })
@@ -46,6 +50,19 @@ export async function reviewAction(_prev: ActionState, form: FormData): Promise<
   if (error) {
     const known = KNOWN.find((k) => error.message.includes(k));
     return { error: known ? error.message : "Could not save that decision. Try again." };
+  }
+  // Tell connected tools. Runs after the response; a failing webhook never affects the decision.
+  if (d.kind === "submit" || d.kind === "item") {
+    const event = d.kind === "submit" ? "submitted" : d.decision;
+    after(async () => {
+      const { data: it } = await supabase.from("content_items").select("title, current_version").eq("id", d.item).single();
+      await dispatch(createAdminClient(), active.orgId, event, {
+        title: `${event === "submitted" ? "Submitted for review" : event.replace("_", " ")}: ${it?.title ?? "item"} (v${it?.current_version ?? "?"})`,
+        item_id: d.item,
+        reason: d.kind === "item" ? d.reason : undefined,
+        link: `${appUrl()}/submissions/${d.item}`,
+      });
+    });
   }
   return { ok: true };
 }

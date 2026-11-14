@@ -15,7 +15,7 @@ export default async function EditFact({ params }: { params: Promise<{ id: strin
 
   const { data, error } = await supabase
     .from("facts")
-    .select("code, version, text, value, tolerance, valid_from, valid_until, replaced_by, owner, source_ref, confidential")
+    .select("code, version, text, value, tolerance, valid_from, valid_until, replaced_by, owner, source_ref, source_url, confidential")
     .eq("id", id.data)
     .eq("org_id", active.orgId)
     .eq("is_current", true)

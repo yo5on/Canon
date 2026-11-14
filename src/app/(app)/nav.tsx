@@ -14,6 +14,7 @@ const GROUPS: {
       { href: "/", label: "Overview", icon: "home" },
       { href: "/submissions", label: "Submissions", icon: "file" },
       { href: "/review", label: "Review queue", icon: "check" },
+      { href: "/inbox", label: "Inbox", icon: "history" },
     ],
   },
   {
@@ -25,11 +26,15 @@ const GROUPS: {
   },
   {
     label: "Governance",
-    items: [{ href: "/audit", label: "Audit history", icon: "history" }],
+    items: [
+      { href: "/governance", label: "Policy & monitoring", icon: "table" },
+      { href: "/integrations", label: "Integrations", icon: "panel" },
+      { href: "/audit", label: "Audit history", icon: "history" },
+    ],
   },
 ];
 
-export function Nav() {
+export function Nav({ unread = 0, manager = false }: { unread?: number; manager?: boolean }) {
   const path = usePathname();
   return (
     <nav aria-label="Main" className="space-y-5 px-2 py-3">
@@ -38,7 +43,7 @@ export function Nav() {
           <p className="mb-1 px-2 text-[11px] font-medium text-muted">
             {group.label}
           </p>
-          {group.items.map((item) => {
+          {group.items.filter((item) => manager || item.href !== "/integrations").map((item) => {
             const active =
               item.href === "/" ? path === "/" : path.startsWith(item.href);
             return (
@@ -50,6 +55,11 @@ export function Nav() {
               >
                 <Icon name={item.icon} size={17} />
                 {item.label}
+                {item.href === "/inbox" && unread > 0 && (
+                  <span className="ml-auto rounded-sm bg-accent px-1.5 text-[11px] font-medium text-accent-ink" aria-label={`${unread} unread`}>
+                    {unread}
+                  </span>
+                )}
               </Link>
             );
           })}

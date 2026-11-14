@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { notFound } from "next/navigation";
 import { Badge, CLAIM_STATUS, Card, EmptyState, PageHeader, StatusBadge, formatDate, formatDateTime, td, th, type Tone } from "@/components/ui";
+import { EvidenceList } from "@/components/evidence";
+import { locate, type Extraction } from "@/lib/extract";
+import type { Evidence } from "@/lib/pipeline";
 import { memberNames, requireWorkspace } from "@/lib/workspace";
+import { SourcePanel, type SourceVersion } from "./source-panel";
 import { ReviewForm } from "./review-form";
 import { RunChecks } from "./run-checks";
 import { ReviseForm } from "./revise-form";
@@ -27,6 +32,7 @@ interface Finding {
   fix_replace: string | null;
   fix_with: string | null;
   confidence: number | null;
+  region: { x: number; y: number; w: number; h: number; image_w: number; image_h: number } | null;
 }
 
 // The verifier's four checks (src/lib/verifier.ts), in plain words.
@@ -35,6 +41,7 @@ const CHECKS: { key: string; ok: string; bad: string }[] = [
   { key: "quote_in_source", ok: "Quoted words appear exactly in that source", bad: "Quoted words are not in the source, or are too short to check" },
   { key: "words_in_draft", ok: "Flagged words appear exactly in this draft version", bad: "Flagged words are not in this draft version" },
   { key: "type_fits", ok: "Finding type matches the source's category", bad: "Finding type doesn't match the source's category" },
+  { key: "region_in_asset", ok: "", bad: "Flagged region is not inside the image" },
 ];
 
 const RUN_STATUS: Record<string, { label: string; tone: Tone }> = {
@@ -79,7 +86,13 @@ function Draft({ body, findings }: { body: string; findings: Finding[] }) {
 }
 
 type Decision = { finding_id: string; decision: string; reason: string; decided_by: string; created_at: string };
-type Perms = { itemId: string; author: boolean; reviewer: boolean; editable: boolean; inReview: boolean; names: Map<string, string> };
+type Perms = { itemId: string; author: boolean; reviewer: boolean; editable: boolean; inReview: boolean; names: Map<string, string>; segments?: Extraction["segments"] };
+
+/** Where in the original file a finding sits: "Page 2", "Paragraph 3", or an image region. */
+function where(f: Finding, segments?: Extraction["segments"]) {
+  if (f.region) return `Image region ${f.region.x},${f.region.y} · ${f.region.w}×${f.region.h}px`;
+  return locate(segments, f.draft_start)?.label ?? null;
+}
 
 type FactInfo = { owner: string; valid_from: string | null; valid_until: string | null; replaced_by: string | null };
 
@@ -96,6 +109,7 @@ function FindingCard({ f, n, fact, claimReason, decisions, p }: { f: Finding; n:
         <span className="text-xs text-faint">
           {f.origin === "code" ? "code check" : `AI${f.confidence !== null ? ` · confidence ${f.confidence.toFixed(2)}` : ""}`}
         </span>
+        {where(f, p.segments) && <span className="rounded-sm bg-secondary px-1.5 text-[11px] text-muted">{where(f, p.segments)}</span>}
       </div>
 
       <p className="mt-3 text-[14px] font-medium leading-6">{f.explanation}</p>
@@ -175,7 +189,11 @@ function FindingCard({ f, n, fact, claimReason, decisions, p }: { f: Finding; n:
         <summary className="cursor-pointer text-accent hover:underline">Why was this raised?</summary>
         <div className="mt-2 space-y-2 rounded-lg border border-line px-3 py-2 text-muted">
           {f.origin === "code" ? (
-            <p>Found by an exact, case-insensitive match of the rule’s banned term. No AI was involved, so it is verified by construction.</p>
+            <p>
+              {f.region || f.draft_quote.startsWith("No alt text") || f.draft_quote.startsWith("Alt text")
+                ? "Measured by code from the uploaded image (pixels, OCR line positions or alt text). No AI was involved. A region is checked to lie inside the image."
+                : "Found by an exact, case-insensitive match of the rule’s banned term. No AI was involved, so it is verified by construction."}
+            </p>
           ) : (
             <>
               {claimReason && <p>Claims Ledger (decided by code, not the model): {claimReason}</p>}
@@ -185,7 +203,7 @@ function FindingCard({ f, n, fact, claimReason, decisions, p }: { f: Finding; n:
                 </p>
               )}
               <ul className="space-y-1">
-                {CHECKS.map((c) => {
+                {CHECKS.filter((c) => c.ok || f.failed_checks.includes(c.key)).map((c) => {
                   const bad = f.failed_checks.includes(c.key);
                   return (
                     <li key={c.key} className={bad ? "text-danger" : "text-ok"}>
@@ -223,17 +241,23 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
 
   const { data: version } = await supabase
     .from("content_versions")
-    .select("id, body")
+    .select("id, body, source_kind, source_name, source_bytes, source_sha256, source_path, extraction, alt_text")
     .eq("item_id", id)
     .eq("version", item.current_version)
     .single();
   if (!version) notFound();
+  const fromFile = version.source_kind !== "text";
+  const { data: signed } =
+    version.source_kind === "image" && version.source_path
+      ? await supabase.storage.from("content-sources").createSignedUrl(version.source_path, 600)
+      : { data: null };
 
   const [runResult, names, reviews] = await Promise.all([
     supabase
       .from("analysis_runs")
-      .select("id, status, model, prompt_version, ai_note, duration_ms, created_at")
+      .select("id, status, model, prompt_version, ai_note, duration_ms, created_at, policy")
       .eq("version_id", version.id)
+      .eq("purpose", "review")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -242,11 +266,30 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
   ]);
   if (runResult.error || reviews.error) throw new Error("Could not load the audit report.");
   const run = runResult.data;
+  const { data: monitor } = await supabase
+    .from("analysis_runs")
+    .select("id, status, created_at, policy")
+    .eq("version_id", version.id)
+    .eq("purpose", "monitor")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const { data: monitorFindings } = monitor
+    ? await supabase.from("findings").select("id, source_code, draft_quote, severity, verified, explanation").eq("run_id", monitor.id)
+    : { data: [] };
+  const { data: currentPolicy } = await supabase
+    .from("policy_versions")
+    .select("version")
+    .eq("org_id", item.org_id)
+    .order("version", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const runPolicy = (run?.policy ?? null) as { version: number } | null;
 
   const [{ data: findingData, error: findingError }, { data: claimData, error: claimError }] = run
     ? await Promise.all([
         supabase.from("findings").select("*").eq("run_id", run.id),
-        supabase.from("claims").select("id, text, type, status, fact_code, reason, finding_id").eq("run_id", run.id),
+        supabase.from("claims").select("id, text, type, status, fact_code, reason, finding_id, evidence, ai_candidates").eq("run_id", run.id),
       ])
     : [{ data: [], error: null }, { data: [], error: null }];
   if (findingError || claimError) throw new Error("Could not load findings and claims.");
@@ -285,7 +328,12 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
     editable: canRun,
     inReview: item.status === "in_review",
     names,
+    segments: (version.extraction as Extraction | null)?.segments,
   };
+  const boxes = findings.flatMap((f, i) => (f.region ? [{ n: i + 1, region: f.region, label: f.explanation }] : []));
+  const key = (f: { source_code: string | null; draft_quote: string }) => `${f.source_code}|${f.draft_quote.trim().toLowerCase()}`;
+  const monitorBase = new Set(findings.filter((f) => f.verified && f.severity === "blocking").map(key));
+  const monitorNew = (monitorFindings ?? []).filter((f) => f.verified && f.severity === "blocking" && !monitorBase.has(key(f)));
 
   return (
     <>
@@ -330,6 +378,12 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
                 {run.model === "mock" ? "DEMO/MOCK provider (no AI call)" : run.model} · prompt {run.prompt_version} · {ai.filter((f) => f.verified).length} of {ai.length} AI findings verified
               </span>
             )}
+            {runPolicy && (
+              <Link href={`/governance/policy/${runPolicy.version}`} className="text-muted underline decoration-line underline-offset-4 hover:text-ink">
+                policy v{runPolicy.version}
+                {currentPolicy && currentPolicy.version !== runPolicy.version && ` (current is v${currentPolicy.version})`}
+              </Link>
+            )}
             {run.duration_ms !== null && <span className="text-faint">{(run.duration_ms / 1000).toFixed(1)} s</span>}
             <span className="text-faint">{formatDateTime(run.created_at)}</span>
           </div>
@@ -351,13 +405,41 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
         </div>
       )}
 
+      {fromFile && <SourcePanel itemId={item.id} v={version as SourceVersion} imageUrl={signed?.signedUrl ?? null} boxes={boxes} />}
+
+      {monitor && (
+        <section className={`mb-5 rounded border px-4 py-3 text-[13px] ${monitorNew.length ? "border-danger/40 bg-danger/5" : "border-line"}`}>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="label">Continuous monitoring</span>
+            <Badge tone={monitorNew.length ? "danger" : "ok"}>
+              {monitorNew.length ? `${monitorNew.length} new blocking issue${monitorNew.length > 1 ? "s" : ""}` : "No new issues"}
+            </Badge>
+            <span className="text-muted">
+              Re-checked {formatDateTime(monitor.created_at)} against policy v{(monitor.policy as { version: number } | null)?.version ?? "?"}
+            </span>
+          </div>
+          {monitorNew.map((f) => (
+            <p key={f.id} className="mt-1 text-xs">
+              <span className="font-mono text-muted">{f.source_code}</span> · “{f.draft_quote}” · {f.explanation}
+            </p>
+          ))}
+          <p className="mt-1 text-xs text-muted">
+            Monitoring never changes this item’s approval. A Reviewer or the author decides what to do; the findings below are from the review run.
+          </p>
+        </section>
+      )}
+
       <div className="report-layout document-section">
         <section className="report-draft-column">
           <div className="document-title">
-            <Icon name="file" size={18} /><h2 className="text-sm font-medium">Submitted content · v{item.current_version}</h2>
+            <Icon name="file" size={18} /><h2 className="text-sm font-medium">Submitted content · v{item.current_version}{fromFile && ` · extracted from ${version.source_name}`}</h2>
           </div>
           <div className="report-draft">
-            <Draft body={version.body} findings={findings} />
+            {version.body ? (
+              <Draft body={version.body} findings={findings} />
+            ) : (
+              <p className="px-5 py-4 text-sm text-muted">No text was found in this file. Visual checks still ran on the image.</p>
+            )}
             {isAuthor && canRun && <ReviseForm key={version.id} itemId={item.id} body={version.body} />}
           </div>
         </section>
@@ -396,7 +478,7 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
           <div className="border-b border-line px-5 py-3.5">
             <h2 className="text-sm font-medium">Claims in this draft</h2>
             <p className="mt-0.5 text-xs text-muted">
-              Checked by code against approved facts valid on {formatDate(item.publish_date)}. “Supported” means it matches the approved register.
+              Checked by code against approved facts valid on {formatDate(item.publish_date)} and the latest retrieval of each fact’s source. “Supported” means it matches the approved register; a retrieved source is shown as evidence, never as approval.
             </p>
           </div>
           <table className="w-full min-w-[640px] text-sm">
@@ -413,6 +495,14 @@ export default async function ItemReport({ params }: { params: Promise<{ id: str
                 <tr key={c.id}>
                   <td className={td}>
                     “{c.text}”<p className="mt-1 text-xs text-muted">{c.reason}</p>
+                    {(((c.evidence as Evidence[] | null) ?? []).length > 0 || !!c.ai_candidates) && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-xs text-accent hover:underline">Evidence</summary>
+                        <div className="mt-2">
+                          <EvidenceList evidence={(c.evidence as Evidence[] | null) ?? []} candidates={c.ai_candidates as never} />
+                        </div>
+                      </details>
+                    )}
                   </td>
                   <td className={`${td} text-muted`}>{c.type}</td>
                   <td className={`${td} font-mono text-xs`}>{c.fact_code ?? "—"}</td>

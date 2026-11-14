@@ -3,6 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Refreshes the Supabase session on every request and keeps signed-out users on /login.
 // Pages re-check the user server-side too, so this is not the only gate.
+const PUBLIC = ["/samples/", "/demo-sources/", "/api/v1/", "/api/cron/"];
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
@@ -24,7 +26,11 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const onLogin = request.nextUrl.pathname === "/login";
+  const path = request.nextUrl.pathname;
+  const onLogin = path === "/login";
+  // Public by design: sample files, the demo source pages, the token-authenticated publish-gate API and the cron
+  // endpoint (which checks CRON_SECRET itself).
+  if (PUBLIC.some((p) => path.startsWith(p))) return response;
 
   if (!user && request.nextUrl.pathname.startsWith("/api/")) {
     const denied = NextResponse.json({ error: "Sign in first" }, { status: 401 });

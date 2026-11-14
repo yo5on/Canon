@@ -27,7 +27,13 @@ export function WorkspaceShell({
           ? "Review queue"
           : path.startsWith("/audit")
             ? "Audit history"
-            : "Overview";
+            : path.startsWith("/governance")
+              ? "Policy & monitoring"
+              : path.startsWith("/integrations")
+                ? "Integrations"
+                : path.startsWith("/inbox")
+                  ? "Inbox"
+                  : "Overview";
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 768px)");

@@ -10,6 +10,8 @@ import {
   td,
   th,
 } from "@/components/ui";
+import { EvidenceList } from "@/components/evidence";
+import type { Evidence } from "@/lib/pipeline";
 import { requireWorkspace } from "@/lib/workspace";
 
 export const metadata: Metadata = { title: "Claims Ledger" };
@@ -39,10 +41,11 @@ export default async function ClaimsLedger() {
     supabase
       .from("claims")
       .select(
-        "id, text, type, status, fact_code, reason, findings(source_text, finding_decisions(decision, reason, created_at)), analysis_runs(model, content_versions(item_id, version, content_items(title, approvals(version, decision, reason, created_at))))",
+        "id, text, type, status, fact_code, reason, evidence, ai_candidates, findings(source_text, finding_decisions(decision, reason, created_at)), analysis_runs!inner(model, purpose, content_versions(item_id, version, content_items(title, approvals(version, decision, reason, created_at))))",
       )
       .eq("org_id", active.orgId)
       .not("status", "is", null)
+      .eq("analysis_runs.purpose", "review")
       .limit(200),
     supabase
       .from("facts")
@@ -138,7 +141,8 @@ export default async function ClaimsLedger() {
                           <q>{finding.source_text}</q>
                         </p>
                       )}
-                      <p className="text-xs leading-5 text-muted">{c.reason}</p>
+                      <p className="mb-2 text-xs leading-5 text-muted">{c.reason}</p>
+                      <EvidenceList compact evidence={(c.evidence as Evidence[] | null) ?? []} candidates={c.ai_candidates as never} />
                     </td>
                     <td className={td}>
                       {c.fact_code ? (

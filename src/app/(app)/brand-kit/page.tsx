@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge, ButtonLink, Card, EmptyState, PageHeader, formatDate, td, th, type Tone } from "@/components/ui";
 import { factState, type FactState } from "@/lib/brandkit";
 import { requireWorkspace } from "@/lib/workspace";
+import { SourcesTab } from "./sources-tab";
 
 export const metadata: Metadata = { title: "Brand Kit" };
 
@@ -15,7 +16,8 @@ const FACT_STATE: Record<FactState, { label: string; tone: Tone }> = {
 };
 
 export default async function BrandKit({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
-  const tab = (await searchParams).tab === "facts" ? "facts" : "rules";
+  const asked = (await searchParams).tab;
+  const tab = asked === "facts" || asked === "sources" ? asked : "rules";
   const { supabase, active } = await requireWorkspace();
   const isManager = active.role === "brand_manager";
   const today = new Date().toISOString().slice(0, 10);
@@ -24,13 +26,13 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
   const [rules, facts] = await Promise.all([
     supabase
       .from("rules")
-      .select("id, code, version, text, category, severity, check_kind, banned_term, replacement, source_ref")
+      .select("id, code, version, text, category, severity, check_kind, check_type, params, banned_term, replacement, source_ref")
       .eq("org_id", active.orgId)
       .eq("is_current", true)
       .order("code"),
     supabase
       .from("facts")
-      .select("id, code, version, text, value, tolerance, valid_from, valid_until, replaced_by, owner, source_ref, confidential")
+      .select("id, code, version, text, value, tolerance, valid_from, valid_until, replaced_by, owner, source_ref, source_url, confidential")
       .eq("org_id", active.orgId)
       .eq("is_current", true)
       .order("code"),
@@ -53,6 +55,7 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
         subtitle={`${rules.data.length} rules · ${facts.data.length} approved facts${isManager ? "" : " · read-only for your role"}`}
         actions={
           isManager &&
+          tab !== "sources" &&
           (tab === "rules" ? (
             <ButtonLink href="/brand-kit/rules/new" primary>
               + New rule
@@ -72,9 +75,14 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
         <Link href="/brand-kit?tab=facts" aria-current={tab === "facts" ? "page" : undefined} className={tabCls(tab === "facts")}>
           Approved facts <span className="text-faint">{facts.data.length}</span>
         </Link>
+        <Link href="/brand-kit?tab=sources" aria-current={tab === "sources" ? "page" : undefined} className={tabCls(tab === "sources")}>
+          Sources
+        </Link>
       </nav>
 
-      {tab === "rules" ? (
+      {tab === "sources" ? (
+        <SourcesTab supabase={supabase} orgId={active.orgId} isManager={isManager} />
+      ) : tab === "rules" ? (
         <Card className="overflow-x-auto">
           {rules.data.length === 0 ? (
             <EmptyState
@@ -91,7 +99,7 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
                   <th className={th}>Category</th>
                   <th className={th}>Check</th>
                   <th className={th}>Severity</th>
-                  {isManager && <th className={th}><span className="sr-only">Actions</span></th>}
+                  <th className={th}><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -107,22 +115,38 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
                           Flags “{r.banned_term}”{r.replacement && <> → “{r.replacement}”</>}
                         </p>
                       )}
+                      {r.check_type === "contrast" && <p className="mt-1 text-xs text-muted">Images: text contrast at least {String((r.params as { min_ratio?: number })?.min_ratio ?? 4.5)}:1</p>}
+                      {r.check_type === "alt_text" && <p className="mt-1 text-xs text-muted">Images: alt text of at least {String((r.params as { min_length?: number })?.min_length ?? 10)} characters</p>}
+                      {r.check_type === "palette" && (
+                        <p className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted">
+                          Images: dominant colours within ΔE {String((r.params as { max_delta?: number })?.max_delta ?? 12)} of
+                          {((r.params as { colors?: string[] })?.colors ?? []).map((c) => (
+                            <span key={c} className="inline-flex items-center gap-1 font-mono">
+                              <span className="inline-block h-3 w-3 rounded-sm border border-line" style={{ background: c }} />
+                              {c}
+                            </span>
+                          ))}
+                        </p>
+                      )}
                       {r.source_ref && <p className="mt-1 text-xs text-faint">Source: {r.source_ref}</p>}
                     </td>
                     <td className={`${td} capitalize text-muted`}>{r.category}</td>
-                    <td className={`${td} text-muted`}>{r.check_kind === "ai" ? "AI" : "Code"}</td>
+                    <td className={`${td} text-muted`}>{r.check_kind === "ai" ? "AI" : r.check_type === "banned_term" ? "Code" : "Code · image"}</td>
                     <td className={td}>
                       <Badge tone={r.severity === "blocking" ? "danger" : "muted"}>
                         {r.severity === "blocking" ? "Blocking" : "Advisory"}
                       </Badge>
                     </td>
-                    {isManager && (
-                      <td className={`${td} text-right`}>
+                    <td className={`${td} whitespace-nowrap text-right`}>
+                      <Link href={`/brand-kit/history/rules/${r.code}`} className="mr-3 text-xs text-muted hover:underline">
+                        History
+                      </Link>
+                      {isManager && (
                         <Link href={`/brand-kit/rules/${r.id}`} className="text-xs text-accent hover:underline">
                           Edit
                         </Link>
-                      </td>
-                    )}
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -154,7 +178,7 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
                     <th className={th}>Owner</th>
                     <th className={th}>Valid</th>
                     <th className={th}>Status</th>
-                    {isManager && <th className={th}><span className="sr-only">Actions</span></th>}
+                    <th className={th}><span className="sr-only">Actions</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
@@ -173,6 +197,11 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
                             </span>
                           )}
                           {f.source_ref && <span className="text-faint">Source: {f.source_ref}</span>}
+                          {f.source_url && (
+                            <a href={f.source_url} target="_blank" rel="noopener noreferrer nofollow" className="text-accent hover:underline">
+                              Source link
+                            </a>
+                          )}
                         </div>
                         {f.confidential && (
                           <div className="mt-1.5">
@@ -188,13 +217,16 @@ export default async function BrandKit({ searchParams }: { searchParams: Promise
                       <td className={td}>
                         <Badge tone={FACT_STATE[states[i]].tone}>{FACT_STATE[states[i]].label}</Badge>
                       </td>
-                      {isManager && (
-                        <td className={`${td} text-right`}>
+                      <td className={`${td} whitespace-nowrap text-right`}>
+                        <Link href={`/brand-kit/history/facts/${f.code}`} className="mr-3 text-xs text-muted hover:underline">
+                          History
+                        </Link>
+                        {isManager && (
                           <Link href={`/brand-kit/facts/${f.id}`} className="text-xs text-accent hover:underline">
                             Edit
                           </Link>
-                        </td>
-                      )}
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

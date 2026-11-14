@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import { DEMO_ACCOUNTS, demoAccount } from "@/lib/demo";
+import { DEMO_ACCOUNTS, aiMode, demoAccount } from "@/lib/demo";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Sign in" };
 export const dynamic = "force-dynamic";
 
+const CAPABILITIES: [string, string][] = [
+  ["Sign-in, roles, row-level security", "Real (Supabase)"],
+  ["PDF, DOCX text and image OCR", "Real, runs on the server"],
+  ["Banned terms, contrast, palette, alt text", "Real, deterministic code checks"],
+  ["Fact register and claim statuses", "Real, decided by code from approved facts"],
+  ["Trusted-source retrieval", "Real https fetch of approved domains"],
+  ["Policy versions, monitoring, webhooks, publish-gate API", "Real"],
+];
+
 export default function LoginPage() {
+  const ai = aiMode();
   const demos = DEMO_ACCOUNTS.flatMap((d) => {
     const acc = demoAccount(d.key);
-    // The password stays on the server: the demo button sends only the account key.
-    return acc ? [{ ...d, email: acc.email }] : [];
+    // Shown on purpose (fictional workspace, restricted roles); the button still sends only the account key.
+    return acc ? [{ key: d.key, role: d.role, can: d.can, email: acc.email, password: acc.password }] : [];
   });
 
   return (
@@ -26,10 +36,29 @@ export default function LoginPage() {
           Your workspace for brand governance.
         </p>
         <LoginForm demos={demos} />
-        <p className="mt-8 border-t border-line pt-4 text-xs leading-5 text-muted">
-          Demo accounts open the fictional Canon Demo Co. workspace. Analysis is
-          clearly labelled when using the mock provider.
-        </p>
+        <section className="mt-8 border-t border-line pt-4 text-xs leading-5 text-muted">
+          <p>
+            Demo accounts open the fictional Canon Demo Co. workspace. Signing in with a demo button restores that
+            account’s login, so changes by one visitor can’t lock out the next. A Creator can’t approve their own work.
+          </p>
+          <p className="label mt-4">What is real in this deployment</p>
+          <table className="mt-2 w-full text-left">
+            <tbody className="divide-y divide-line">
+              {CAPABILITIES.map(([what, how]) => (
+                <tr key={what}>
+                  <td className="py-1.5 pr-3 text-ink">{what}</td>
+                  <td className="py-1.5">{how}</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-1.5 pr-3 text-ink">AI rule and claim review</td>
+                <td className="py-1.5">
+                  {ai === "live" ? "Live Claude model" : "Demo / mock provider (no AI key configured). Every report says so."}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
       </div>
     </main>
   );

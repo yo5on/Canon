@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { CATEGORIES, CHECK_KINDS, SEVERITIES } from "@/lib/brandkit";
+import { useState } from "react";
+import { CATEGORIES, CHECK_KINDS, CHECK_TYPES, SEVERITIES } from "@/lib/brandkit";
 import { saveFact, saveRule, type FormState } from "./actions";
 
 type Values = Record<string, string | number | boolean | null>;
@@ -79,6 +80,7 @@ export function RuleForm({ id, initial = {} }: { id: string | null; initial?: Va
   const [state, action, pending] = useActionState<FormState, FormData>(saveRule.bind(null, id), {});
   const e = state.errors;
   const v: Values = state.values ?? initial;
+  const [type, setType] = useState(str(v.check_type) || "banned_term");
 
   return (
     <form action={action} key={state.n ?? 0}>
@@ -105,7 +107,7 @@ export function RuleForm({ id, initial = {} }: { id: string | null; initial?: Va
             ))}
           </select>
         </Field>
-        <Field label="Check" name="check_kind" error={e?.check_kind} hint="Code checks match a banned term exactly.">
+        <Field label="Check" name="check_kind" error={e?.check_kind} hint="Code checks are deterministic; AI checks are verified by code.">
           <select id="check_kind" name="check_kind" defaultValue={str(v.check_kind) || "ai"} className="field">
             {CHECK_KINDS.map((k) => (
               <option key={k} value={k}>
@@ -114,12 +116,42 @@ export function RuleForm({ id, initial = {} }: { id: string | null; initial?: Va
             ))}
           </select>
         </Field>
-        <Field label="Banned term" name="banned_term" error={e?.banned_term} hint="Required for code checks.">
-          <input id="banned_term" name="banned_term" defaultValue={str(v.banned_term)} className="field" {...aria(e, "banned_term")} />
+        <Field label="Code check type" name="check_type" error={e?.check_type} hint="Contrast, palette and alt text run on uploaded images.">
+          <select id="check_type" name="check_type" value={type} onChange={(ev) => setType(ev.target.value)} className="field">
+            {CHECK_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {{ banned_term: "Banned term (all text)", contrast: "Text contrast (images)", palette: "Brand palette (images)", alt_text: "Alt text (images)" }[t]}
+              </option>
+            ))}
+          </select>
         </Field>
-        <Field label="Replacement" name="replacement" error={e?.replacement} hint="What to say instead (optional).">
-          <input id="replacement" name="replacement" defaultValue={str(v.replacement)} className="field" />
-        </Field>
+        {type === "banned_term" && (
+          <>
+            <Field label="Banned term" name="banned_term" error={e?.banned_term} hint="Required for code checks.">
+              <input id="banned_term" name="banned_term" defaultValue={str(v.banned_term)} className="field" {...aria(e, "banned_term")} />
+            </Field>
+            <Field label="Replacement" name="replacement" error={e?.replacement} hint="What to say instead (optional).">
+              <input id="replacement" name="replacement" defaultValue={str(v.replacement)} className="field" />
+            </Field>
+          </>
+        )}
+        {type === "contrast" && (
+          <Field label="Minimum contrast ratio" name="min_ratio" error={e?.min_ratio} hint="WCAG 2.2 AA: 4.5 for body text, 3 for large text.">
+            <input id="min_ratio" name="min_ratio" inputMode="decimal" defaultValue={str(v.min_ratio) || "4.5"} className="field" {...aria(e, "min_ratio")} />
+          </Field>
+        )}
+        {type === "alt_text" && (
+          <Field label="Minimum alt text length" name="min_length" error={e?.min_length} hint="Characters.">
+            <input id="min_length" name="min_length" inputMode="numeric" defaultValue={str(v.min_length) || "10"} className="field" {...aria(e, "min_length")} />
+          </Field>
+        )}
+        {type === "palette" && (
+          <div className="sm:col-span-2">
+            <Field label="Brand colours" name="palette" error={e?.palette} hint="Hex codes, e.g. #28645A, #FFFFFF. Dominant image colours further than ΔE 12 from all of them are flagged.">
+              <input id="palette" name="palette" defaultValue={str(v.palette)} className="field font-mono" {...aria(e, "palette")} />
+            </Field>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <Field label="Source" name="source_ref" error={e?.source_ref} hint="Where this rule comes from, e.g. voice-guide-v4.pdf p.6 §2.1">
             <input id="source_ref" name="source_ref" defaultValue={str(v.source_ref)} className="field" />
@@ -164,9 +196,14 @@ export function FactForm({ id, initial = {} }: { id: string | null; initial?: Va
         <Field label="Replaced by" name="replaced_by" error={e?.replaced_by} hint="Code of the newer fact, if any.">
           <input id="replaced_by" name="replaced_by" defaultValue={str(v.replaced_by)} className="field font-mono" />
         </Field>
-        <Field label="Source" name="source_ref" error={e?.source_ref}>
+        <Field label="Source" name="source_ref" error={e?.source_ref} hint="Document reference, e.g. Q3 board pack p.4">
           <input id="source_ref" name="source_ref" defaultValue={str(v.source_ref)} className="field" />
         </Field>
+        <div className="sm:col-span-2">
+          <Field label="Source URL" name="source_url" error={e?.source_url} hint="Optional https page that states this fact. Canon retrieves it from trusted domains (Brand Kit → Sources) and records whether it still says so.">
+            <input id="source_url" name="source_url" type="url" defaultValue={str(v.source_url)} placeholder="https://" className="field" {...aria(e, "source_url")} />
+          </Field>
+        </div>
         <label className="flex items-start gap-3 rounded-lg border border-amber/30 bg-amber/5 p-3 text-sm sm:col-span-2">
           <input type="checkbox" name="confidential" defaultChecked={v.confidential === true || v.confidential === "on"} className="mt-0.5 accent-[#f2b54b]" />
           <span>

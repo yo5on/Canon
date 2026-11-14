@@ -1,7 +1,9 @@
 // Seeds the fictional Canon Demo Co. workspace (plus a "Rival Demo Ltd." outsider workspace for isolation tests)
 // into the Supabase project in .env.local, using the service key. Run after the migrations:
 //   node scripts/seed-demo.mjs
-// Idempotent: existing users, workspaces, memberships, rules and facts are left as they are. Never prints secrets.
+// Idempotent, and also a reset: re-running it restores the demo passwords, the baseline Brand Kit (a changed rule or
+// fact gets a new version with the baseline text, so history is kept) and the trusted sources. Never prints secrets.
+// DEMO_SOURCE_BASE (default https://canon-rose.vercel.app) is where public/demo-sources/*.html is served.
 // User ids are fixed because supabase/tests/security.sql refers to them.
 import { createClient } from "@supabase/supabase-js";
 
@@ -55,6 +57,26 @@ const FACTS = {
   rival: [{ code: "FACT-1", text: "Rival Demo Ltd. has 300 customers.", value: 300, owner: "Rival Finance" }],
 };
 
+const SRC = (process.env.DEMO_SOURCE_BASE ?? "https://canon-rose.vercel.app").replace(/\/$/, "");
+RULES.canon.push(
+  { code: "ACC-2", category: "accessibility", severity: "blocking", check_kind: "code", check_type: "contrast", params: { min_ratio: 4.5 },
+    source_ref: "Accessibility checklist §2 (WCAG 2.2 AA 1.4.3)", text: "Text in images must have a contrast ratio of at least 4.5:1 against its background." },
+  { code: "ACC-3", category: "accessibility", severity: "advisory", check_kind: "code", check_type: "alt_text", params: { min_length: 10 },
+    source_ref: "Accessibility checklist §5", text: "Every image needs alt text of at least 10 characters that describes it." },
+  { code: "BRAND-1", category: "visual", severity: "advisory", check_kind: "code", check_type: "palette",
+    params: { colors: ["#28645A", "#FFFFFF", "#E6EFEB", "#1F2328"], max_delta: 12, min_share: 0.03 },
+    source_ref: "Brand guidelines 2026 §6 Colour", text: "Images use only the brand palette: Canon green #28645A, white, mist #E6EFEB and ink #1F2328." },
+);
+const URLS = { "FACT-1": "/demo-sources/about.html", "FACT-2": "/demo-sources/survey-2025.html", "FACT-3": "/demo-sources/coverage.html", "FACT-4": "/demo-sources/about.html" };
+for (const f of FACTS.canon) if (URLS[f.code]) f.source_url = SRC + URLS[f.code];
+const SOURCES = { canon: [{ name: "Canon Demo Co. public site (fictional demo pages)", domain: new URL(SRC).host }], rival: [] };
+const FIELDS = {
+  rules: ["text", "category", "severity", "check_kind", "banned_term", "replacement", "check_type", "params", "source_ref"],
+  facts: ["text", "value", "valid_from", "valid_until", "owner", "source_ref", "source_url", "confidential"],
+};
+const DEFAULTS = { banned_term: null, replacement: null, check_type: "banned_term", params: {}, source_ref: null, source_url: null, valid_from: null, valid_until: null, confidential: false };
+const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null) || (a != null && b != null && Number(a) === Number(b) && typeof b === "number");
+
 const ORGS = { canon: "Canon Demo Co.", rival: "Rival Demo Ltd." };
 
 async function must(p, what) {
@@ -70,7 +92,8 @@ for (const u of USERS) {
   const password = env[`DEMO_${u.key}_PASSWORD`];
   if (!email || !password) throw new Error(`DEMO_${u.key}_EMAIL / _PASSWORD missing`);
   if (list.users.some((x) => x.id === u.id)) {
-    console.log(`user ${email}: exists`);
+    await must(db.auth.admin.updateUserById(u.id, { email, password, email_confirm: true }), `reset ${email}`);
+    console.log(`user ${email}: exists, login restored`);
     continue;
   }
   await must(
@@ -91,10 +114,28 @@ for (const [key, name] of Object.entries(ORGS)) {
 
   const creator = USERS.find((u) => u.org === key && u.role === "brand_manager").id;
   for (const [table, rows] of [["rules", RULES[key]], ["facts", FACTS[key]]]) {
-    const have = new Set((await must(db.from(table).select("code").eq("org_id", org.id), table)).map((r) => r.code));
-    const missing = rows.filter((r) => !have.has(r.code)).map((r) => ({ ...(table === "facts" ? { confidential: false } : {}), ...r, org_id: org.id, created_by: creator }));
-    if (missing.length) await must(db.from(table).insert(missing), `insert ${table}`);
-    console.log(`  ${table}: ${missing.length} added, ${have.size} already there`);
+    const current = await must(db.from(table).select("*").eq("org_id", org.id).eq("is_current", true), table);
+    let added = 0, restored = 0;
+    for (const r of rows) {
+      const want = { ...DEFAULTS, ...r };
+      if (table === "rules") (delete want.source_url, delete want.valid_from, delete want.valid_until, delete want.confidential);
+      else (delete want.banned_term, delete want.replacement, delete want.check_type, delete want.params);
+      const cur = current.find((c) => c.code === r.code);
+      if (!cur) {
+        await must(db.from(table).insert({ ...want, org_id: org.id, created_by: creator, version: 1, is_current: true }), `insert ${table} ${r.code}`);
+        added++;
+        continue;
+      }
+      if (FIELDS[table].filter((k) => k in want).every((k) => same(cur[k], want[k]))) continue;
+      // Same order as the app: new version not current → retire old → promote new.
+      const [nv] = await must(db.from(table).insert({ ...want, org_id: org.id, created_by: creator, code: r.code, version: cur.version + 1, is_current: false }).select("id"), `version ${r.code}`);
+      await must(db.from(table).update({ is_current: false }).eq("id", cur.id), `retire ${r.code}`);
+      await must(db.from(table).update({ is_current: true }).eq("id", nv.id), `promote ${r.code}`);
+      restored++;
+    }
+    console.log(`  ${table}: ${added} added, ${restored} restored to baseline`);
   }
+  for (const t of SOURCES[key]) await must(db.from("trusted_sources").upsert({ org_id: org.id, ...t, active: true, added_by: creator }, { onConflict: "org_id,domain" }), "trusted source");
+  await must(db.rpc("snapshot_policy", { p_org: org.id, p_note: "Demo baseline (seed script)" }), "snapshot");
 }
 console.log("seed done");

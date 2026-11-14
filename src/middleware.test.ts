@@ -14,3 +14,10 @@ it("continues redirecting signed-out page visits to login", async () => {
   expect(result.status).toBe(307);
   expect(result.headers.get("location")).toBe("http://localhost/login");
 });
+it("lets public paths through without a session: samples, demo sources, token API and cron", async () => {
+  for (const p of ["/samples/canon-demo-launch-brochure.pdf", "/demo-sources/investor-update.html", "/api/v1/items/x/gate", "/api/cron/monitor"]) {
+    const result = await middleware(new NextRequest(`http://localhost${p}`));
+    expect(result.status, p).toBe(200);
+  }
+  expect((await middleware(new NextRequest("http://localhost/api/uploads"))).status).toBe(401);
+});

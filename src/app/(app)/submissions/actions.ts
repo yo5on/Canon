@@ -4,18 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { fieldErrors } from "@/lib/brandkit";
+import { itemFields } from "@/lib/items";
 import { requireWorkspace } from "@/lib/workspace";
 
 export type SubmitState = { errors?: Record<string, string>; values?: Record<string, string>; n?: number };
 
-// Mirrors the content_items / content_versions CHECK constraints in 0001_init.sql.
-const itemSchema = z.object({
-  title: z.string().trim().min(1, "Give the item a title").max(200),
-  channel: z.string().trim().min(1).max(60),
-  audience: z.string().trim().max(120),
-  goal: z.string().trim().max(300, "Keep the goal to one line (300 characters)"),
-  publish_date: z.iso.date({ message: "Choose the planned publish date" }),
-  reviewer: z.uuid("Choose a reviewer before saving"),
+const itemSchema = itemFields.extend({
   body: z.string().trim().min(1, "Paste the draft text").max(40000, "Drafts are limited to about 6,000 words"),
 });
 

@@ -11,7 +11,10 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, memberships, active } = await getContext();
+  const { supabase, user, memberships, active } = await getContext();
+  const { count: unread } = active
+    ? await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("org_id", active.orgId).is("read_at", null)
+    : { count: 0 };
   const name = active?.displayName || user.email || "Member";
   const initials = name
     .split(/[\s@.]+/)
@@ -24,7 +27,7 @@ export default async function AppLayout({
       workspace={active?.orgName ?? "Workspace"}
       sidebar={
         <>
-          <Nav />
+          <Nav unread={unread ?? 0} manager={active?.role === "brand_manager"} />
           <div className="mt-auto border-t border-line p-3">
             {memberships.length > 1 && (
               <form action={switchWorkspace} className="mb-3 space-y-2">

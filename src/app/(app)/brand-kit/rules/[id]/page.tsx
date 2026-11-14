@@ -15,7 +15,7 @@ export default async function EditRule({ params }: { params: Promise<{ id: strin
 
   const { data, error } = await supabase
     .from("rules")
-    .select("code, version, text, category, severity, check_kind, banned_term, replacement, source_ref")
+    .select("code, version, text, category, severity, check_kind, check_type, params, banned_term, replacement, source_ref")
     .eq("id", id.data)
     .eq("org_id", active.orgId)
     .eq("is_current", true)
@@ -30,7 +30,16 @@ export default async function EditRule({ params }: { params: Promise<{ id: strin
         title={`Edit ${data.code}`}
         subtitle={`Currently v${data.version}. Saving creates v${data.version + 1}; earlier versions stay on record.`}
       />
-      <RuleForm id={id.data} initial={data} />
+      <RuleForm
+        id={id.data}
+        initial={{
+          ...data,
+          params: null,
+          min_ratio: String((data.params as { min_ratio?: number })?.min_ratio ?? ""),
+          min_length: String((data.params as { min_length?: number })?.min_length ?? ""),
+          palette: ((data.params as { colors?: string[] })?.colors ?? []).join(", "),
+        }}
+      />
     </>
   );
 }

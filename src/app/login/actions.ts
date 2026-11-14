@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { demoAccount, type DemoKey } from "@/lib/demo";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { DEMO_ACCOUNTS, demoAccount, type DemoKey } from "@/lib/demo";
 
 export type SignInState = { error?: string; email?: string };
 
@@ -22,6 +23,13 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
 
   const parsed = credentials.safeParse(input);
   if (!parsed.success) return { error: parsed.error.issues[0].message, email: input.email };
+
+  // Judges share these logins: put the email and password back first, so one judge changing them can't lock out the next.
+  if (demo.success) {
+    const id = DEMO_ACCOUNTS.find((d) => d.key === demo.data)!.id;
+    const { error: resetErr } = await createAdminClient().auth.admin.updateUserById(id, { ...parsed.data, email_confirm: true });
+    if (resetErr) console.error("demo reset failed:", resetErr.status, resetErr.code);
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);

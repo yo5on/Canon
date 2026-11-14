@@ -10,12 +10,13 @@ export function RunChecks({ itemId, label }: { itemId: string; label: string }) 
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/items/${itemId}/analyze`, { method: "POST" });
+      // The server stops at 60 s; give up slightly later so the button never hangs.
+      const res = await fetch(`/api/items/${itemId}/analyze`, { method: "POST", signal: AbortSignal.timeout(75_000) });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) setError(body.error ?? "Checks failed. Try again.");
       else window.location.reload();
-    } catch {
-      setError("Could not reach Canon. Check your connection and try again.");
+    } catch (e) {
+      setError((e as Error).name === "TimeoutError" ? "Checks are taking too long. Reload the page in a minute to see if they finished." : "Could not reach Canon. Check your connection and try again.");
     } finally {
       setBusy(false);
     }

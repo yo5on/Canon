@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { signIn, type SignInState } from "./actions";
 
-type Demo = { key: string; role: string; email: string };
+type Demo = { key: string; role: string; can: string; email: string; password: string };
 
 export function LoginForm({ demos }: { demos: Demo[] }) {
   const [state, action, pending] = useActionState<SignInState, FormData>(signIn, {});
@@ -43,6 +43,11 @@ export function LoginForm({ demos }: { demos: Demo[] }) {
                   <div className="min-w-0 text-xs">
                     <p className="text-sm font-medium">{d.role}</p>
                     <p className="truncate font-mono text-muted">{d.email}</p>
+                    <p className="truncate font-mono text-muted">
+                      <span className="sr-only">Password: </span>
+                      {d.password}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-faint">{d.can}</p>
                   </div>
                   <button
                     disabled={pending}
