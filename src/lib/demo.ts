@@ -16,5 +16,5 @@ export function demoAccount(key: DemoKey) {
   return email && password ? { email, password } : null;
 }
 
-/** "live" only when a real model key is configured and mock mode is off. */
-export const aiMode = () => (process.env.CANON_AI_MOCK === "1" || !process.env.ANTHROPIC_API_KEY ? "mock" : "live");
+/** Same choice as aiClient() in analyze.ts: mock flag first, then a real key, else no AI provider at all. */
+export const aiMode = () => (process.env.CANON_AI_MOCK === "1" ? "mock" : process.env.ANTHROPIC_API_KEY ? "live" : "off");

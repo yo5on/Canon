@@ -9,7 +9,7 @@ const CAPABILITIES: [string, string][] = [
   ["Sign-in, roles, row-level security", "Real (Supabase)"],
   ["PDF, DOCX text and image OCR", "Real, runs on the server"],
   ["Banned terms, contrast, palette, alt text", "Real, deterministic code checks"],
-  ["Fact register and claim statuses", "Real, decided by code from approved facts"],
+  ["Fact register and claim statuses", "Real, decided by code. SUPPORTED means it matches an approved fact, not proof it is true"],
   ["Trusted-source retrieval", "Real https fetch of approved domains"],
   ["Policy versions, monitoring, webhooks, publish-gate API", "Real"],
 ];
@@ -53,7 +53,11 @@ export default function LoginPage() {
               <tr>
                 <td className="py-1.5 pr-3 text-ink">AI rule and claim review</td>
                 <td className="py-1.5">
-                  {ai === "live" ? "Live Claude model" : "Demo / mock provider (no AI key configured). Every report says so."}
+                  {ai === "live"
+                    ? "Live Claude model"
+                    : ai === "mock"
+                      ? "Demo / mock provider: fixed sample responses, not general AI analysis. No AI model is called; every report says so."
+                      : "Off: no AI provider configured. Only the code checks run."}
                 </td>
               </tr>
             </tbody>

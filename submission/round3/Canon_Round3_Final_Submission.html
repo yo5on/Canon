@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CANON – Brand Governance Platform · Round 3 Submission · Team CODEX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<!-- Editable source of Canon_Round3_Final_Submission.pdf.
+     Export: msedge --headless --print-to-pdf=Canon_Round3_Final_Submission.pdf --no-pdf-header-footer Canon_Round3_Final_Submission.html -->
+<style>
+:root{
+  --paper:#FBFAF7; --ink:#1C2321; --body:#2E3532; --muted:#5F6661; --faint:#8B918C;
+  --line:#E3E0D8; --soft:#F2F0EA;
+  --accent:#28645A; --accent-ink:#1E4D45; --accent-soft:#E6EFEB;
+  --amber:#8A5D20; --amber-soft:#F6EEDF; --red:#A9392F; --red-soft:#F7E6E3; --slate:#4F5A66; --slate-soft:#EAEDF0;
+  --serif:"Source Serif 4",Georgia,serif; --sans:Inter,"Segoe UI",system-ui,sans-serif; --mono:"JetBrains Mono",Consolas,monospace;
+}
+@page{size:A4;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#d9d7d1}
+body{font-family:var(--sans);color:var(--body);font-size:9.3pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;margin:0 auto 8mm;background:var(--paper);position:relative;overflow:hidden;padding:19mm 18mm 20mm;page-break-after:always;break-after:page}
+@media print{html,body{background:var(--paper)}.page{margin:0}}
+.page:last-child{page-break-after:auto;break-after:auto}
+.run{position:absolute;left:18mm;right:18mm;top:9mm;display:flex;justify-content:space-between;font:500 7pt/1 var(--mono);letter-spacing:.06em;color:var(--faint);text-transform:uppercase}
+.foot{position:absolute;left:18mm;right:18mm;bottom:9mm;display:flex;justify-content:space-between;align-items:center;font:500 7pt/1 var(--mono);color:var(--faint);border-top:1px solid var(--line);padding-top:3mm}
+.foot b{color:var(--ink);font-weight:500}
+.kicker{font:500 7.5pt/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:3mm}
+h1{font:700 23pt/1.1 var(--serif);color:var(--ink);letter-spacing:-.01em;margin-bottom:4mm}
+h2{font:600 12.5pt/1.25 var(--serif);color:var(--ink);margin:5.5mm 0 2.2mm}
+h3{font:600 9.4pt/1.3 var(--sans);color:var(--ink);margin:0 0 1.2mm}
+p{margin-bottom:2.4mm}
+.lede{font:400 11pt/1.5 var(--serif);color:var(--body);max-width:160mm;margin-bottom:5mm}
+.muted{color:var(--muted)} .small{font-size:8.2pt}
+code{font-family:var(--mono);font-size:7.8pt;background:var(--soft);padding:.2mm 1mm;border-radius:1mm;color:var(--ink)}
+ul.clean{list-style:none} ul.clean li{padding-left:4mm;position:relative;margin-bottom:1.4mm}
+ul.clean li::before{content:"";position:absolute;left:0;top:2.1mm;width:1.6mm;height:1px;background:var(--accent)}
+strong{color:var(--ink);font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+table{width:100%;border-collapse:collapse;font-size:8.3pt;line-height:1.42}
+th{font:600 6.9pt/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:2mm 2.2mm;border-bottom:1.2px solid var(--ink)}
+td{padding:1.9mm 2.2mm;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child,th:first-child{padding-left:0}
+td.k{font-weight:600;color:var(--ink);white-space:nowrap}
+.note{border-left:2.5px solid var(--accent);background:var(--accent-soft);padding:3mm 4mm;margin:4mm 0;font-size:8.7pt}
+.note.warn{border-color:var(--amber);background:var(--amber-soft)}
+.note h3{margin-bottom:.8mm}
+.note p:last-child{margin-bottom:0}
+.chip{display:inline-block;font:600 6.6pt/1 var(--mono);letter-spacing:.04em;padding:1mm 1.6mm;border-radius:.8mm;white-space:nowrap}
+.s-sup{background:var(--accent-soft);color:var(--accent-ink)}
+.s-con{background:var(--red-soft);color:var(--red)}
+.s-out{background:var(--amber-soft);color:var(--amber)}
+.s-uns{background:#F4EADF;color:#7A4A1E}
+.s-hj{background:var(--slate-soft);color:var(--slate)}
+.s-def{background:var(--soft);color:var(--muted)}
+figure{margin:0}
+figure img{display:block;width:100%;border:1px solid var(--line);border-radius:1mm}
+figcaption{font-size:7.6pt;color:var(--muted);margin-top:1.6mm;line-height:1.4}
+figcaption b{color:var(--ink);font-weight:600}
+/* flow diagrams */
+.flow{display:flex;align-items:stretch;gap:0;margin:3mm 0 4mm}
+.flow .st{flex:1;border:1px solid var(--line);background:#fff;border-radius:1.2mm;padding:2.6mm 2.4mm;text-align:center}
+.flow .st .n{font:600 6.6pt/1 var(--mono);color:var(--accent);letter-spacing:.08em;margin-bottom:1.4mm}
+.flow .st .t{font:600 9pt/1.2 var(--sans);color:var(--ink)}
+.flow .st .d{font-size:7.1pt;color:var(--muted);margin-top:1mm;line-height:1.35}
+.flow .ar{width:5mm;display:flex;align-items:center;justify-content:center;color:var(--accent);font:600 10pt/1 var(--sans)}
+.flow .st.hl{border-color:var(--accent);background:var(--accent-soft)}
+.flow .st.mock{border-style:dashed;background:var(--amber-soft);border-color:var(--amber)}
+/* architecture */
+.arch{display:grid;grid-template-columns:38mm 1fr 52mm;gap:4mm;align-items:stretch;margin:3mm 0 2mm}
+.box{border:1px solid var(--line);background:#fff;border-radius:1.4mm;padding:3mm}
+.box .lab{font:600 6.6pt/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:2mm}
+.box h3{font-size:9pt}
+.box ul.clean li{font-size:7.8pt;margin-bottom:.9mm;line-height:1.35}
+.box.ext{background:var(--soft)}
+.box.mock{border-style:dashed;border-color:var(--amber);background:var(--amber-soft)}
+.inner2{display:grid;grid-template-columns:1fr 1fr;gap:3mm}
+.conn{font:500 7pt/1.3 var(--mono);color:var(--muted);text-align:center;margin:1.5mm 0}
+/* cover */
+.cover{padding:0;background:var(--paper)}
+.cover .band{position:absolute;left:0;top:0;bottom:0;width:9mm;background:var(--accent)}
+.cover .inner{position:absolute;left:30mm;right:22mm;top:28mm;bottom:22mm;display:flex;flex-direction:column}
+.cover .word{font:700 60pt/1 var(--sans);letter-spacing:.2em;color:var(--ink);margin:10mm 0 4mm}
+.cover .tag{font:400 19pt/1.3 var(--serif);color:var(--ink);font-style:italic;margin-bottom:9mm}
+.cover .desc{font:400 11pt/1.55 var(--serif);color:var(--body);max-width:125mm}
+.cover .flowline{margin-top:10mm;font:500 8.4pt/1.6 var(--mono);color:var(--accent-ink);letter-spacing:.02em}
+.cover .meta{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:6mm 10mm;border-top:1.2px solid var(--ink);padding-top:6mm}
+.cover .meta .lab{font:600 6.8pt/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.6mm}
+.cover .meta div div{font-size:9.3pt;color:var(--ink);line-height:1.5}
+.toc{width:100%}
+.toc td{padding:2.2mm 0;font-size:9.4pt}
+.toc td.n{width:12mm;font-family:var(--mono);font-size:8pt;color:var(--accent)}
+.toc td.p{width:12mm;text-align:right;font-family:var(--mono);font-size:8pt;color:var(--muted)}
+.compact td{padding:1.15mm 2mm}.compact td:first-child{padding-left:0}
+.ver{font:600 6.4pt/1 var(--mono);padding:1mm 1.5mm;border-radius:.8mm;white-space:nowrap;display:inline-block}
+.v-repo{background:var(--accent-soft);color:var(--accent-ink)}
+.v-run{background:#E3ECF5;color:#2F5277}
+.v-obs{background:var(--amber-soft);color:var(--amber)}
+.v-team{background:var(--soft);color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- 1 · COVER -->
+<section class="page cover">
+  <div class="band"></div>
+  <div class="inner">
+    <div class="kicker">CodeTitans India 2026 · Round 3 Submission</div>
+    <div class="word">CANON</div>
+    <div class="tag">Brand Governance Platform</div>
+    <p class="desc">Canon reviews content against an organisation's approved brand rules, terminology, facts and visual guidelines before publication. It shows what was flagged, why and on what evidence, and it keeps a person responsible for every publishing decision.</p>
+    <div class="flowline">Submit → Analyse → Inspect Findings → Review Evidence → Decide → Audit</div>
+    <div class="meta">
+      <div><div class="lab">Team</div><div>CODEX</div></div>
+      <div><div class="lab">Institution</div><div>CHRIST (Deemed to be University),<br>Kengeri Campus</div></div>
+      <div><div class="lab">Team members</div><div>Yoson Y<br>Raphael Roger A<br>Bryan Donato Anand<br>Macario Andric</div></div>
+      <div><div class="lab">Links</div><div>canon-rose.vercel.app<br>github.com/yo5on/Canon<br><span class="muted">Production commit</span> <code>87904388</code></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · CONTENTS + PROBLEM -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>Team CODEX</span></div>
+  <div class="kicker">Contents</div>
+  <table class="toc">
+    <tr><td class="n">01</td><td>Problem Statement</td><td class="p">2</td></tr>
+    <tr><td class="n">02</td><td>Our Solution</td><td class="p">3</td></tr>
+    <tr><td class="n">03</td><td>Round 3 Improvements</td><td class="p">4</td></tr>
+    <tr><td class="n">04</td><td>Claims Ledger</td><td class="p">7</td></tr>
+    <tr><td class="n">05</td><td>Review and Accountability</td><td class="p">8</td></tr>
+    <tr><td class="n">06</td><td>Technology and Architecture</td><td class="p">9</td></tr>
+    <tr><td class="n">07</td><td>Security and Reliability</td><td class="p">10</td></tr>
+    <tr><td class="n">08</td><td>Production Deployment</td><td class="p">11</td></tr>
+    <tr><td class="n">09</td><td>Current AI Provider Disclosure</td><td class="p">11</td></tr>
+    <tr><td class="n">10</td><td>Limitations</td><td class="p">12</td></tr>
+    <tr><td class="n">11</td><td>Future Scope</td><td class="p">12</td></tr>
+    <tr><td class="n">12</td><td>Conclusion</td><td class="p">12</td></tr>
+    <tr><td class="n">A</td><td>Appendix: Verification Status</td><td class="p">13</td></tr>
+    <tr><td class="n">B</td><td>Appendix: Round 2 Commitments and Delivery</td><td class="p">14</td></tr>
+  </table>
+
+  <div class="kicker" style="margin-top:12mm">01 · Problem Statement</div>
+  <h1>Brand consistency breaks down at scale</h1>
+  <p class="lede">Organisations publish marketing content across many platforms, teams and formats. Keeping brand identity, claims, approved terminology and policy compliance consistent across all of it is difficult.</p>
+  <p>Manual review is slow, inconsistent and hard to audit. Reviewers can miss outdated facts, unsupported claims, incorrect terminology or departures from approved brand guidelines, and there is often no record of why a piece of content was approved.</p>
+  <div class="cols" style="margin-top:4mm">
+    <div class="note"><h3>What goes wrong</h3><p>A figure from last year's survey is reused after it expires. A superlative ("the fastest-growing") is published without an approved fact behind it. A banned term slips into a caption on an image that no text checker reads.</p></div>
+    <div class="note"><h3>What is missing</h3><p>A single place that checks every format against the same approved rules and facts, shows the evidence for each finding, and records who decided what, and why.</p></div>
+  </div>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>2</span></div>
+</section>
+
+<!-- 3 · SOLUTION -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>02 · Our Solution</span></div>
+  <div class="kicker">02 · Our Solution</div>
+  <h1>Evidence first, people decide</h1>
+  <p class="lede">Canon reviews content against the organisation's approved brand rules, terminology, facts and visual guidelines before publication. It shows what was flagged, why and on what evidence. Canon never publishes anything itself.</p>
+
+  <div class="flow">
+    <div class="st"><div class="n">1</div><div class="t">Submit</div><div class="d">Text, PDF, DOCX or image, saved as a version</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">2</div><div class="t">Analyse</div><div class="d">Code checks, citation verifier, Claims Ledger</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">3</div><div class="t">Inspect findings</div><div class="d">Each cites a rule or fact word for word</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">4</div><div class="t">Review evidence</div><div class="d">Matched fact, validity dates, source retrieval</div></div>
+    <div class="ar">→</div>
+    <div class="st hl"><div class="n">5</div><div class="t">Decide</div><div class="d">Approve, request changes or reject</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">6</div><div class="t">Audit</div><div class="d">Append-only record of every action</div></div>
+  </div>
+
+  <table>
+    <tr><th style="width:32mm">Step</th><th>What happens</th></tr>
+    <tr><td class="k">Submit</td><td>A Creator pastes text or uploads a PDF, DOCX or image. The draft is saved as a version.</td></tr>
+    <tr><td class="k">Analyse</td><td>Deterministic code checks run. The AI provider (mock in production) proposes findings and claims; code verifies every quote and decides each claim's status against the approved fact register.</td></tr>
+    <tr><td class="k">Inspect findings</td><td>Each finding cites the exact rule or fact it relies on, quoted word for word.</td></tr>
+    <tr><td class="k">Review evidence</td><td>Reviewers see the matched fact, its validity dates and the latest retrieval of its source.</td></tr>
+    <tr><td class="k">Decide</td><td>A Reviewer approves, requests changes or rejects; overriding a finding requires a reason.</td></tr>
+    <tr><td class="k">Audit</td><td>Every action is written to an append-only audit log.</td></tr>
+  </table>
+
+  <figure style="margin-top:6mm">
+    <img src="img/overview.png" alt="Canon workspace overview showing content items, review status and recent activity">
+    <figcaption><b>Workspace overview.</b> Content items, pending reviews and recent activity, including scheduled monitoring runs. Live application, demo workspace, 16 Nov 2026.</figcaption>
+  </figure>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>3</span></div>
+</section>
+
+<!-- 4 · 3A MULTIMODAL -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>03 · Round 3 Improvements</span></div>
+  <div class="kicker">03 · Round 3 Improvements</div>
+  <h1>A. Multimodal brand compliance</h1>
+  <p class="lede">Canon accepts four kinds of content in the same review workflow, so documents and image assets are checked against the same rules as plain text.</p>
+  <table>
+    <tr><th style="width:30mm">Format</th><th>How it is read <span style="text-transform:none;letter-spacing:0">(<code>src/lib/extract.ts</code>)</span></th></tr>
+    <tr><td class="k">Text</td><td>Pasted directly into the submission form.</td></tr>
+    <tr><td class="k">PDF</td><td>Text layer extracted page by page. A PDF with no text layer (a scan) is rejected with a message asking for images instead.</td></tr>
+    <tr><td class="k">DOCX</td><td>Paragraph text extracted. Legacy <code>.doc</code> files are rejected with a clear message.</td></tr>
+    <tr><td class="k">PNG, JPEG, WebP</td><td>Optical character recognition (OCR) with Tesseract.js, using the bundled English model. OCR runs on the server with no network call.</td></tr>
+  </table>
+  <ul class="clean" style="margin-top:4mm">
+    <li>Files are identified by their content (magic bytes), not only by extension. The upload limit is 10 MB; images are limited to 40 megapixels.</li>
+    <li>Every extracted line keeps a reference back to its page, paragraph or image region, so a finding can point to where it came from.</li>
+    <li>Uploads go to a private Supabase Storage bucket (<code>content-sources</code>) through short-lived signed URLs.</li>
+    <li>Image assets also get deterministic visual checks (<code>src/lib/visualchecks.ts</code>): WCAG 2.2 contrast ratio of each OCR line, dominant colours compared with the brand palette, and alt-text presence.</li>
+  </ul>
+  <figure style="margin-top:5mm">
+    <img src="img/submit.png" alt="Submit content form with Paste text and Upload a file options">
+    <figcaption><b>Submit content.</b> Paste text or upload a file. The panel on the right lists exactly what will run, including the DEMO/MOCK notice. The draft text shown is the prefilled demo sample.</figcaption>
+  </figure>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>4</span></div>
+</section>
+
+<!-- 5 · 3B SOURCE INTELLIGENCE -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>03 · Round 3 Improvements</span></div>
+  <div class="kicker">03 · Round 3 Improvements</div>
+  <h1>B. Live fact verification and source intelligence</h1>
+  <p class="lede">Each approved fact can cite a source page. Canon can retrieve that page and check whether it still states the fact (<code>src/lib/sources.ts</code>).</p>
+
+  <div class="flow">
+    <div class="st"><div class="n">FACT</div><div class="t">Approved fact</div><div class="d">Text, validity dates, cited source URL</div></div>
+    <div class="ar">→</div>
+    <div class="st hl"><div class="n">SAFEFETCH</div><div class="t">Guarded retrieval</div><div class="d">https only · approved domains · no private IPs · timeout and size limit</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">CODE</div><div class="t">Compare page with fact</div><div class="d">No model involved</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">OUTCOME</div><div class="t">Recorded check</div><div class="d">confirmed · not_found · changed · unavailable · blocked</div></div>
+  </div>
+
+  <ul class="clean">
+    <li>Retrieval goes through <code>safeFetch</code>, which only fetches <strong>https</strong> URLs on <strong>domains the workspace has approved</strong>. Hosts that resolve to private or internal IP addresses are blocked, and requests have a timeout and a size limit.</li>
+    <li>Code, not a model, compares the page with the fact. Each check records one outcome: <code>confirmed</code>, <code>not_found</code>, <code>changed</code>, <code>unavailable</code> or <code>blocked</code>.</li>
+    <li>Retrieved text is <strong>evidence for a reviewer</strong>. It never turns a claim SUPPORTED on its own.</li>
+  </ul>
+  <p style="margin-top:3mm">Together with the fact register, this lets Canon identify unsupported claims, contradictory information, outdated facts, and claims that need human judgement.</p>
+
+  <figure style="margin-top:5mm">
+    <img src="img/report.png" alt="Audit report for a submission, showing the DEMO/MOCK banner, monitoring status and a supported claim">
+    <figcaption><b>Audit report.</b> The DEMO/MOCK label, continuous-monitoring status (re-checked against policy v1) and the claims table. The claim matches FACT-1, valid on the publish date. The note above the table explains that a retrieved source is shown as evidence, never as approval.</figcaption>
+  </figure>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>5</span></div>
+</section>
+
+<!-- 6 · 3C GOVERNANCE -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>03 · Round 3 Improvements</span></div>
+  <div class="kicker">03 · Round 3 Improvements</div>
+  <h1>C. Continuous governance and integrations</h1>
+  <p class="lede" style="margin-bottom:3mm">Governance continues after approval.</p>
+  <table>
+    <tr><td class="k" style="width:34mm">Policy versions</td><td>A policy version is the exact set of rule and fact versions in force. Every analysis run records the version it applied, and each rule or fact has a field-by-field, word-level change history.</td></tr>
+    <tr><td class="k">Continuous monitoring</td><td>Approved and in-review content is re-checked when a rule or fact it relied on changes, a cited fact expires, or a fact's source stops confirming it (<code>src/lib/monitor.ts</code>). Monitoring never changes an approval; new blocking issues raise an alert. Runs on demand, and a daily scheduled job is defined in <code>vercel.json</code>.</td></tr>
+    <tr><td class="k">Notifications</td><td>Review events and monitoring alerts appear in each user's inbox.</td></tr>
+    <tr><td class="k">Webhooks</td><td>Events (<code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>changes_requested</code>, <code>monitor_alert</code>, <code>source_changed</code>) are sent to a Slack-compatible incoming webhook or as signed JSON (HMAC-SHA256, <code>x-canon-signature</code>). Every delivery attempt is logged.</td></tr>
+    <tr><td class="k">Publish-gate API</td><td><code>GET /api/v1/items/:id/gate</code> answers whether an item may be published: it must be approved, the approved version must be current, there must be no open blocking issues and, if a SHA-256 hash is supplied, the text must match the approved text exactly. Read-only, workspace-scoped tokens, stored only as hashes.</td></tr>
+  </table>
+  <figure style="margin-top:5mm">
+    <img src="img/governance.png" alt="Governance page with continuous monitoring, policy versions and the Guideline Gap Radar">
+    <figcaption><b>Governance.</b> Monitoring controls and the last scheduled run (16 Nov, 09:54), policy version v1 with its contents, and the Guideline Gap Radar listing override reasons.</figcaption>
+  </figure>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>6</span></div>
+</section>
+
+<!-- 7 · CLAIMS LEDGER -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>04 · Claims Ledger</span></div>
+  <div class="kicker">04 · Claims Ledger</div>
+  <h1>Every claim gets one explicit status</h1>
+  <p class="lede">The Claims Ledger records every factual claim in a draft and its outcome. <strong>Code, not the model, decides each status</strong> (<code>src/lib/ledger.ts</code>).</p>
+  <table>
+    <tr><th style="width:40mm">Status</th><th>Meaning</th></tr>
+    <tr><td><span class="chip s-sup">SUPPORTED</span></td><td>Matches an approved fact that is current on the publish date</td></tr>
+    <tr><td><span class="chip s-con">CONTRADICTED</span></td><td>Evidence conflicts with the claim</td></tr>
+    <tr><td><span class="chip s-out">OUTDATED</span></td><td>Claim is no longer current</td></tr>
+    <tr><td><span class="chip s-uns">UNSUPPORTED</span></td><td>Sufficient supporting evidence is unavailable</td></tr>
+    <tr><td><span class="chip s-hj">HUMAN_JUDGEMENT</span></td><td>Requires a human decision</td></tr>
+  </table>
+  <div class="note">
+    <h3>What SUPPORTED means</h3>
+    <p>SUPPORTED means the claim matches the organisation's approved facts, not that its truth has been independently established in the real world.</p>
+  </div>
+  <p>Statuses are checked in a fixed order, and the first match wins: <strong>HUMAN_JUDGEMENT → CONTRADICTED → SUPPORTED → OUTDATED → UNSUPPORTED</strong>. For example, if a cited quote cannot be found in the fact it names, the claim goes to HUMAN_JUDGEMENT rather than being shown as fact.</p>
+  <figure style="margin-top:4mm">
+    <img src="img/claims-ledger.png" alt="Claims Ledger table listing claims with status, supporting evidence, related fact and review decision">
+    <figcaption><b>Claims Ledger.</b> Each claim with its status, the evidence behind it, the related approved fact and the review decision, including override reasons. Demo workspace data; the claims come from the mock provider.</figcaption>
+  </figure>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>7</span></div>
+</section>
+
+<!-- 8 · REVIEW AND ACCOUNTABILITY -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>05 · Review and Accountability</span></div>
+  <div class="kicker">05 · Review and Accountability</div>
+  <h1>Clear roles, recorded decisions</h1>
+  <table>
+    <tr><th style="width:32mm">Role</th><th>Responsibilities</th></tr>
+    <tr><td class="k">Creator</td><td>Submits text, PDF, DOCX or images and runs checks.</td></tr>
+    <tr><td class="k">Reviewer</td><td>Works through the review queue and decides on findings and submissions.</td></tr>
+    <tr><td class="k">Brand Manager</td><td>Maintains the Brand Kit, trusted sources, policy versions, monitoring and integrations.</td></tr>
+  </table>
+  <ul class="clean" style="margin-top:4mm">
+    <li>A Creator cannot approve their own work, and a reviewer must belong to the item's workspace and cannot be its author. These rules are enforced in the database.</li>
+    <li>Overriding a finding requires a written reason, checked by the server action and by a database constraint. Reasons appear on the Governance page's <em>Guideline Gap Radar</em>, which lists the rules most often rejected or overridden.</li>
+    <li>Every state change is written to an append-only audit log that no user, including administrators, can edit or delete through the application.</li>
+  </ul>
+  <figure style="margin-top:5mm">
+    <img src="img/audit.png" alt="Append-only audit history listing actions by user and system">
+    <figcaption><b>Audit history.</b> Append-only record of review decisions, monitoring runs, policy versions and API token events, with who acted and on which item.</figcaption>
+  </figure>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>8</span></div>
+</section>
+
+<!-- 9 · ARCHITECTURE -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>06 · Technology and Architecture</span></div>
+  <div class="kicker">06 · Technology and Architecture</div>
+  <h1>One Next.js application on Supabase</h1>
+  <div class="cols" style="gap:6mm">
+    <table>
+      <tr><td class="k">Frontend</td><td>React, TypeScript and Next.js (App Router)</td></tr>
+      <tr><td class="k">Backend</td><td>Next.js server-side API routes. (The earlier Python/FastAPI prototype was retired.)</td></tr>
+      <tr><td class="k">Database</td><td>Supabase PostgreSQL</td></tr>
+      <tr><td class="k">Authentication</td><td>Supabase Auth</td></tr>
+    </table>
+    <table>
+      <tr><td class="k">Authorisation</td><td>Role-based access control and Row Level Security</td></tr>
+      <tr><td class="k">Storage</td><td>Private Supabase Storage</td></tr>
+      <tr><td class="k">Extraction</td><td>unpdf, mammoth, sharp, Tesseract.js</td></tr>
+      <tr><td class="k">Deployment</td><td>Vercel</td></tr>
+    </table>
+  </div>
+
+  <h2>System architecture</h2>
+  <div class="arch">
+    <div class="box"><div class="lab">Client</div><h3>Browser</h3><ul class="clean"><li>Creator, Reviewer, Brand Manager</li><li>Supabase Auth session</li></ul>
+      <div class="lab" style="margin-top:4mm">Machine clients</div><ul class="clean"><li>CMS / pipeline: publish-gate API with a bearer token</li><li>Vercel Cron: daily monitoring job</li></ul></div>
+    <div class="box"><div class="lab">Vercel · Next.js</div>
+      <div class="inner2">
+        <div><h3>Server components</h3><ul class="clean"><li>Pages read with the user's session, so RLS applies</li><li>Server actions for reviews and Brand Kit edits</li></ul></div>
+        <div><h3>API routes</h3><ul class="clean"><li><code>/api/uploads</code>, <code>/api/items/from-file</code></li><li><code>/api/items/:id/analyze</code></li><li><code>/api/v1/items</code>, <code>…/gate</code></li><li><code>/api/cron/monitor</code></li></ul></div>
+      </div>
+      <div class="conn">extract · code checks · verifier · Claims Ledger · monitoring · webhooks</div>
+      <div class="box mock" style="padding:2mm 3mm"><h3 style="font-size:8.4pt">AI provider: DEMO / MOCK in production</h3><p class="small" style="margin:0">Fixed responses for sample phrases; no model is called. A live-model path exists in code but is not enabled.</p></div>
+    </div>
+    <div class="box"><div class="lab">Supabase</div><h3>PostgreSQL</h3><ul class="clean"><li>Row Level Security</li><li>Role-checked state-change functions</li><li>Approval trigger, append-only audit log</li></ul>
+      <h3 style="margin-top:2.5mm">Auth</h3><ul class="clean"><li>Email sign-in, demo accounts</li></ul>
+      <h3 style="margin-top:2.5mm">Storage</h3><ul class="clean"><li>Private <code>content-sources</code> bucket</li></ul></div>
+  </div>
+  <div class="cols" style="gap:4mm;margin-top:3mm">
+    <div class="box ext"><div class="lab">Outbound · approved domains only</div><p class="small" style="margin:0">Source retrieval through <code>safeFetch</code>: https only, private addresses blocked.</p></div>
+    <div class="box ext"><div class="lab">Outbound · webhooks</div><p class="small" style="margin:0">Slack-compatible or HMAC-signed JSON, https only; every attempt logged.</p></div>
+  </div>
+
+  <h2>Analysis pipeline (one run)</h2>
+  <div class="flow" style="margin-bottom:2mm">
+    <div class="st"><div class="n">1 · CODE</div><div class="t">Code checks</div><div class="d">Banned terms; contrast, palette, alt text</div></div>
+    <div class="ar">→</div>
+    <div class="st mock"><div class="n">2 · PROVIDER</div><div class="t">Proposals</div><div class="d">Findings and claims (mock in production)</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">3 · CODE</div><div class="t">Citation verifier</div><div class="d">Quotes must exist word for word</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">4 · CODE</div><div class="t">Claims Ledger</div><div class="d">Status decided against the fact register</div></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="n">5 · DB</div><div class="t">Store</div><div class="d">With the policy version applied</div></div>
+  </div>
+  <p class="small muted">Reads made for a user use that user's session, so Postgres RLS decides what they see. Pipeline writes use a server-only service client. Submit, approve and reject go through database functions that check the caller's role.</p>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>9</span></div>
+</section>
+
+<!-- 10 · SECURITY -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>07 · Security and Reliability</span></div>
+  <div class="kicker">07 · Security and Reliability</div>
+  <h1>Permissions live in the database</h1>
+  <h2 style="margin-top:2mm">Implemented in the repository</h2>
+  <ul class="clean">
+    <li>Row Level Security enabled on all 20 tables created by the migrations (13 in <code>0001_init.sql</code>, 7 in <code>0005_round3.sql</code>); a read-only query on production found no public table without it.</li>
+    <li>Workspace isolation for items, findings, claims, sources, notifications and Storage folders.</li>
+    <li>API tokens stored only as SHA-256 hashes; the plain token is shown once.</li>
+    <li>Outgoing requests (source retrieval, webhooks) limited to https and blocked from private addresses.</li>
+    <li>Webhook payloads signed with HMAC-SHA256.</li>
+    <li>Append-only audit log, source checks and policy versions.</li>
+    <li>A scheduled-job endpoint that refuses to run unless <code>CRON_SECRET</code> is configured.</li>
+    <li>The Round 3 production migration (<code>supabase/apply-round3-production.sql</code>) runs in a single transaction, with a production fingerprint guard, preflight checks and verification queries.</li>
+  </ul>
+  <h2>Round 3 production hardening</h2>
+  <p>Applied to the production database in a separate step after the main migration, and confirmed on 16 Nov 2026 with a read-only catalog query (privileges, policies and function body):</p>
+  <ul class="clean">
+    <li>Restricted access to API token hashes.</li>
+    <li>One-way API token revocation (a revoked token cannot be re-enabled).</li>
+    <li>Workspace-scoped notification generation.</li>
+    <li>Membership-aware notification access.</li>
+    <li>Safer Storage folder-name validation.</li>
+  </ul>
+  <div class="note warn"><p>These changes are <strong>not part of production commit <code>87904388</code></strong>. They are now written as the re-runnable migration <code>supabase/migrations/0007_round3_hardening.sql</code>, tested locally to produce the same schema as the production path. At the time of writing it is in the team's working copy and <strong>not yet committed</strong> to the public repository.</p></div>
+  <h2>Checks run during this review</h2>
+  <p class="small muted" style="margin-bottom:1.5mm">16 November 2026, on the repository at <code>87904388</code>.</p>
+  <table>
+    <tr><th style="width:62mm">Check</th><th>Result</th></tr>
+    <tr><td><code>npx tsc --noEmit</code></td><td>Passed, no errors</td></tr>
+    <tr><td><code>npm run lint</code></td><td>Passed: 0 errors, 3 warnings</td></tr>
+    <tr><td><code>vitest run</code> (13 test files)</td><td>110 / 110 passed. The live RLS test (<code>src/lib/rls.live.test.ts</code>) was excluded because it connects to the live database.</td></tr>
+    <tr><td>Working copy with the final-review fixes</td><td><code>tsc</code> passed; lint 0 errors, 3 warnings; <code>vitest</code> 113 / 113 passed in 14 files (live RLS test excluded); migration 0007 test 27 / 27 on local PostgreSQL 17 and 18 (PGlite).</td></tr>
+  </table>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>10</span></div>
+</section>
+
+<!-- 11 · DEPLOYMENT + AI DISCLOSURE -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>08 · Deployment · 09 · AI Disclosure</span></div>
+  <div class="kicker">08 · Production Deployment</div>
+  <h1 style="font-size:19pt">Live at canon-rose.vercel.app</h1>
+  <table>
+    <tr><td class="k" style="width:44mm">Vercel deployment</td><td>READY, checked through the Vercel API during this review</td></tr>
+    <tr><td class="k">Commit deployed</td><td><code>87904388</code> on <code>main</code>: "Add transactional, re-runnable Round 3 production migration with preflight and verification queries"</td></tr>
+    <tr><td class="k">Smoke test</td><td>During this review, the Brand Manager one-click demo sign-in and read-only pages (overview, submission report, Claims Ledger, Governance, Integrations, Brand Kit, Audit history) were checked on production. The team's earlier smoke tests also covered the Reviewer and Creator demo sign-ins; those were not repeated here.</td></tr>
+    <tr><td class="k">Scheduled monitoring</td><td>The production Governance page shows a scheduled monitoring run on 16 Nov, 09:54.</td></tr>
+  </table>
+
+  <div class="kicker" style="margin-top:6mm">09 · Current AI Provider Disclosure</div>
+  <h1 style="font-size:19pt">Production runs the demo/mock AI provider</h1>
+  <p>The production deployment uses the <strong>demo/mock AI provider</strong> (<code>src/lib/ai.mock.ts</code>, enabled by <code>CANON_AI_MOCK</code>).</p>
+  <ul class="clean">
+    <li>No AI model is called. Runs are stored with the model name <code>mock</code>, and every report is labelled <strong>DEMO/MOCK provider (no AI call)</strong>.</li>
+    <li>The mock provider returns a fixed response for recognised sample phrases. Other wording is not analysed and needs manual review. This is <strong>not</strong> general AI analysis.</li>
+    <li>The code checks, citation verifier, Claims Ledger, source retrieval, review workflow, monitoring and audit log all run for real on that response.</li>
+    <li>The repository also contains a live-model code path (<code>src/lib/ai.ts</code>) that uses the Anthropic SDK when a key is configured and mock mode is off. It is <strong>not enabled in production</strong>, and this document does not describe its output.</li>
+  </ul>
+  <div class="note warn"><h3>What was observed</h3><p>The production login page, which computes its AI status from the server environment, reports the mock provider. Every report viewed during this review is labelled DEMO/MOCK; the code records a run as <code>mock</code> only when <code>CANON_AI_MOCK=1</code>. The production environment variables themselves were not inspected.</p></div>
+
+  <h2>What is real in this deployment <span class="small muted" style="font:400 8pt var(--sans)">· as stated on the production login page</span></h2>
+  <table>
+    <tr><th>Capability</th><th style="width:60mm">Status in production</th></tr>
+    <tr><td>Sign-in, roles, Row Level Security</td><td><span class="chip s-sup">REAL</span></td></tr>
+    <tr><td>PDF and DOCX text extraction, image OCR</td><td><span class="chip s-sup">REAL</span> runs on the server</td></tr>
+    <tr><td>Banned terms, contrast, palette, alt text</td><td><span class="chip s-sup">REAL</span> deterministic code checks</td></tr>
+    <tr><td>Fact register and claim statuses</td><td><span class="chip s-sup">REAL</span> decided by code</td></tr>
+    <tr><td>Trusted-source retrieval</td><td><span class="chip s-sup">REAL</span> https, approved domains</td></tr>
+    <tr><td>Policy versions, monitoring, webhooks, publish-gate API</td><td><span class="chip s-sup">REAL</span></td></tr>
+    <tr><td>AI rule and claim review</td><td><span class="chip s-out">DEMO / MOCK</span> no model called</td></tr>
+  </table>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>11</span></div>
+</section>
+
+<!-- 12 · LIMITATIONS, FUTURE, CONCLUSION -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>10–12 · Limitations · Future Scope · Conclusion</span></div>
+  <div class="kicker">10 · Limitations</div>
+  <h1 style="font-size:19pt">What Canon does not do yet</h1>
+  <table>
+    <tr><td class="k" style="width:48mm">AI analysis is mocked</td><td>Only recognised sample phrases produce AI findings in production; everything else needs manual review.</td></tr>
+    <tr><td class="k">SUPPORTED is register-based</td><td>It means a claim matches the organisation's approved facts, not that the claim is independently true.</td></tr>
+    <tr><td class="k">English-only OCR</td><td>Results depend on image quality. Scanned PDFs without a text layer must be uploaded as images.</td></tr>
+    <tr><td class="k">HTML-only retrieval</td><td>Source retrieval reads page HTML only. Content rendered by JavaScript or behind a login is not seen.</td></tr>
+    <tr><td class="k">Hardening migration uncommitted</td><td>Migration <code>0007</code>, which matches the hardening already on production, is not yet in the public repository (Section 7).</td></tr>
+    <tr><td class="k">No native CMS integration</td><td>Integration is through the publish-gate API and webhooks. There is no CMS plugin or connector (Appendix B).</td></tr>
+    <tr><td class="k">Leaked-password protection</td><td>Not enabled at the time of the team's security review (<code>docs/SECURITY_HARDENING.md</code>), because the Supabase project is on the Free plan.</td></tr>
+  </table>
+
+  <div class="kicker" style="margin-top:9mm">11 · Future Scope</div>
+  <ul class="clean">
+    <li>Enable live model analysis behind the existing schema validation, verifier, Claims Ledger and daily token budget.</li>
+    <li>Commit migration <code>0007_round3_hardening.sql</code> so the public repository matches the production schema.</li>
+    <li>Add more OCR languages and layout-aware extraction for multi-column PDFs.</li>
+    <li>Native connectors for common CMS and design tools that call the existing publish-gate API.</li>
+  </ul>
+
+  <div class="kicker" style="margin-top:9mm">12 · Conclusion</div>
+  <p class="lede">Canon makes brand governance structured, transparent and accountable. It combines multimodal content intake, source-aware fact review, a Claims Ledger decided by code, versioned policies, continuous monitoring and human decision-making in one workflow, and it states clearly which parts are live and which run in demo mode.</p>
+  <p style="font:600 11pt/1.4 var(--serif);color:var(--accent-ink);margin-top:6mm">CODEX — Building accountable brand governance with Canon.</p>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>12</span></div>
+</section>
+
+<!-- 13 · APPENDIX -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>Appendix A</span></div>
+  <div class="kicker">Appendix A</div>
+  <h1 style="font-size:19pt">Verification status</h1>
+  <p>How each claim in this document was checked. <span class="ver v-repo">REPO</span> read in the source code · <span class="ver v-run">RUN</span> checked during this review · <span class="ver v-obs">OBSERVED</span> seen in the live application · <span class="ver v-team">TEAM</span> reported by the team, not re-checked here.</p>
+  <table style="margin-top:3mm">
+    <tr><th>Claim</th><th style="width:62mm">Basis</th><th style="width:24mm">Status</th></tr>
+    <tr><td>PDF, DOCX, PNG, JPEG and WebP extraction</td><td><code>src/lib/extract.ts</code>, <code>src/lib/items.ts</code></td><td><span class="ver v-repo">REPO</span></td></tr>
+    <tr><td>Offline English OCR with the bundled Tesseract.js model</td><td><code>src/lib/extract.ts</code>, <code>next.config.ts</code></td><td><span class="ver v-repo">REPO</span></td></tr>
+    <tr><td>Five Claims Ledger statuses, decided in code</td><td><code>src/lib/ledger.ts</code></td><td><span class="ver v-repo">REPO</span></td></tr>
+    <tr><td>Source retrieval limited to approved https domains</td><td><code>safeFetch</code> in <code>src/lib/sources.ts</code></td><td><span class="ver v-repo">REPO</span></td></tr>
+    <tr><td>Policy versions, monitoring, webhooks, publish-gate API</td><td><code>src/lib/monitor.ts</code>, <code>src/lib/webhooks.ts</code>, <code>src/app/api/v1/</code></td><td><span class="ver v-repo">REPO</span></td></tr>
+    <tr><td>Override reasons required; one-time token display</td><td><code>submissions/[id]/actions.ts</code>, <code>integrations/actions.ts</code>, <code>0001_init.sql</code></td><td><span class="ver v-repo">REPO</span></td></tr>
+    <tr><td>Type check, lint, unit tests</td><td>Run locally (Section 7)</td><td><span class="ver v-run">RUN</span></td></tr>
+    <tr><td>Production deployment READY on <code>87904388</code></td><td>Vercel API</td><td><span class="ver v-run">RUN</span></td></tr>
+    <tr><td>Brand Manager sign-in and pages work in production</td><td>Live application, 16 Nov 2026</td><td><span class="ver v-run">RUN</span></td></tr>
+    <tr><td>Production uses the mock provider</td><td>Login page status and DEMO/MOCK labels on reports; environment variables not inspected</td><td><span class="ver v-obs">OBSERVED</span></td></tr>
+    <tr><td>Scheduled monitoring runs in production</td><td>Governance page shows a scheduled run</td><td><span class="ver v-obs">OBSERVED</span></td></tr>
+    <tr><td>Reviewer and Creator smoke tests</td><td>Team's earlier production smoke test</td><td><span class="ver v-team">TEAM</span></td></tr>
+    <tr><td>Token, notification and Storage hardening in production</td><td>Read-only catalog query on production, 16 Nov 2026</td><td><span class="ver v-run">RUN</span></td></tr>
+    <tr><td><code>CRON_SECRET</code> configured in production</td><td>Team's earlier check (endpoint returns 401, not 503)</td><td><span class="ver v-team">TEAM</span></td></tr>
+  </table>
+  <div class="note" style="margin-top:6mm"><p>Every screenshot in this document was captured from the live application on 16 November 2026, in the fictional <em>Canon Demo Co.</em> workspace, signed in as the demo Brand Manager. That sign-in used the application's own demo button, which resets the demo account's email and password to their configured values before signing in. Apart from that, nothing in the production application, its data, Supabase or Vercel settings was changed while preparing this document. No secrets or environment values appear in it, and the production login page, which shows the demo account passwords, was deliberately not included as a screenshot.</p></div>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>13</span></div>
+</section>
+
+<!-- 14 · APPENDIX B · ROUND 2 COMMITMENTS -->
+<section class="page">
+  <div class="run"><span>Canon · Round 3</span><span>Appendix B</span></div>
+  <div class="kicker">Appendix B</div>
+  <h1 style="font-size:19pt">Round 2 commitments and what was delivered</h1>
+  <p class="small" style="margin-bottom:1mm">Each line is a promise from Section 08 of our Round 2 submission, checked against the code.</p>
+  <table class="compact" style="margin-top:1mm;font-size:7.7pt;line-height:1.3">
+    <tr><th>Round 2 promise</th><th style="width:22mm">Status</th><th style="width:80mm">What exists</th></tr>
+    <tr><td colspan="3" class="k">1 · Multimodal Brand Compliance</td></tr>
+    <tr><td>PDF and DOCX extraction mapped to page and position</td><td><span class="chip s-out">PARTIAL</span></td><td>Page (PDF) and paragraph (DOCX) references; no layout coordinates. <code>extract.ts</code></td></tr>
+    <tr><td>Palette, contrast and text-in-image checks</td><td><span class="chip s-sup">DELIVERED</span></td><td>Server OCR, WCAG contrast per OCR line, palette comparison. <code>visualchecks.ts</code></td></tr>
+    <tr><td>Logo-use checks</td><td><span class="chip s-con">NOT DONE</span></td><td>No logo detection.</td></tr>
+    <tr><td>Accessibility checks in code (contrast, alt text)</td><td><span class="chip s-sup">DELIVERED</span></td><td>Deterministic code checks stored as versioned rule rows.</td></tr>
+    <tr><td>Visual findings cite a verified region</td><td><span class="chip s-sup">DELIVERED</span></td><td>A region outside the image is downgraded and cannot block.</td></tr>
+    <tr><td>Brand Kit asset library (logos, palette, fonts)</td><td><span class="chip s-out">PARTIAL</span></td><td>Palette is stored as rule parameters; no logo or font library.</td></tr>
+    <tr><td colspan="3" class="k">2 · Live Fact Verification and Source Intelligence</td></tr>
+    <tr><td>Workspace-approved trusted sources</td><td><span class="chip s-sup">DELIVERED</span></td><td>Per-workspace domain allowlist; https only, private addresses blocked, every redirect re-checked. <code>sources.ts</code></td></tr>
+    <tr><td>Source reference on each fact, shown on each claim</td><td><span class="chip s-sup">DELIVERED</span></td><td>Register evidence and retrieved evidence are stored and shown separately.</td></tr>
+    <tr><td>Detect claims made outdated by a source change; notify the fact owner</td><td><span class="chip s-out">PARTIAL</span></td><td>Source checks are run on demand by a Brand Manager. A <code>changed</code> outcome alerts the workspace's Brand Managers and is picked up by the next monitoring run. The fact's named owner is not notified individually.</td></tr>
+    <tr><td>A retrieved source is evidence, never automatic SUPPORTED</td><td><span class="chip s-sup">DELIVERED</span></td><td>Covered by unit tests. <code>ledger.ts</code></td></tr>
+    <tr><td>Send relevant facts instead of the whole register</td><td><span class="chip s-sup">DELIVERED</span></td><td>Large registers ranked by word overlap with the draft. Not exercised in production, where no model is called.</td></tr>
+    <tr><td colspan="3" class="k">3 · Continuous Brand Governance and Integrations</td></tr>
+    <tr><td>Integrations with publishing platforms</td><td><span class="chip s-out">PARTIAL</span></td><td>Generic publish-gate API, Slack-compatible and signed-JSON webhooks. <strong>No native CMS integration.</strong></td></tr>
+    <tr><td>Version-aware policies recorded on every check</td><td><span class="chip s-sup">DELIVERED</span></td><td>Policy versions, per-run policy copy, word-level change history.</td></tr>
+    <tr><td>Preview a policy change against recent content</td><td><span class="chip s-con">NOT DONE</span></td><td>Changes apply first; monitoring then re-checks affected content.</td></tr>
+    <tr><td>Re-check content when a fact expires or a rule changes</td><td><span class="chip s-sup">DELIVERED</span></td><td>Daily scheduled job and on-demand runs. <code>monitor.ts</code></td></tr>
+    <tr><td>Background jobs with retries, audit entry per run</td><td><span class="chip s-out">PARTIAL</span></td><td>Audit entry per monitoring run; analysis is still synchronous; no job queue or retry beyond the AI SDK's.</td></tr>
+    <tr><td>Guideline Gap Radar from override reasons</td><td><span class="chip s-sup">DELIVERED</span></td><td>Governance page.</td></tr>
+    <tr><td>Humans approve; integrations never publish</td><td><span class="chip s-sup">DELIVERED</span></td><td>The gate API is read-only; the database requires a human approver who is not the author.</td></tr>
+    <tr><td colspan="3" class="k">Reliability work</td></tr>
+    <tr><td>Live inference in production</td><td><span class="chip s-con">NOT DONE</span></td><td>Production uses the DEMO/MOCK provider (Section 9).</td></tr>
+    <tr><td>Measure on Canon Bench before reporting accuracy</td><td><span class="chip s-con">NOT DONE</span></td><td>No benchmark was run, and no accuracy figure is claimed.</td></tr>
+  </table>
+  <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>14</span></div>
+</section>
+
+</body>
+</html>
