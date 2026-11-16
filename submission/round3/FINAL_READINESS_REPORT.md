@@ -8,7 +8,7 @@ The application deployed on `87904388` works and discloses its limits honestly. 
 
 - AI analysis is DEMO/MOCK in production, as disclosed.
 - Several Round 2 promises are partial or not done. This is now stated in Appendix B of the PDF.
-- Everything changed in this review is **uncommitted**. Only you can decide whether to commit or push, and a push to `main` redeploys production (§11).
+- Everything changed in this review is **uncommitted** (superseded: since committed as `c831826` on branch `round3-final-readiness`; not merged into `main`). Only you can decide whether to commit or push, and a push to `main` redeploys production (§11).
 
 ## 2. Critical issues found and fixed (working copy only, uncommitted)
 
@@ -187,7 +187,7 @@ Source: Round 2 submission, §08 "Round 3 roadmap" (`docs/round2/Canon_CodeTitan
 - **Layout:** the PDF was regenerated with the documented workflow (headless Edge `--print-to-pdf --no-pdf-header-footer`). It has 14 pages, and every page fits within its footer, measured with the screenshots at their real heights (smallest margin about 22px, on page 11). Pages 8, 10, 11, 13 and 14 were also rendered as images with headless Edge and checked by eye: no clipping or overlap.
 - **Numbering:** Appendix B was added on a new last page, so the earlier page numbers and table-of-contents references are unchanged, and the TOC lists Appendix B on page 14. The Markdown source was updated to match.
 
-## 10. Files modified or created (all uncommitted)
+## 10. Files modified or created (all uncommitted at the time; since committed in `c831826`)
 
 **Created:**
 - `supabase/migrations/0007_round3_hardening.sql`
@@ -219,7 +219,7 @@ Outside the repo: `D:\Scratch\canon-pglite-round3\run-0007.mjs` and `out-0007-pg
    - re-run the Vercel check and a smoke test;
    - regenerate the PDF.
 
-   Alternatively, push to a branch, or submit `87904388` as it stands. Note that the document says 0007 is "not yet committed", so that sentence must be updated if you commit it.
+   Alternatively, push to a branch, or submit `87904388` as it stands. Note that the document says 0007 is "not yet committed", so that sentence must be updated if you commit it. (Done: the submission was corrected after `c831826` was pushed.)
 3. **Do not apply 0007 to production.** It is already applied.
 4. The login-page disclosure fix is only visible after a deploy.
 5. The smoke-test token "ROUND3-SMOKE-TEST delete-me" (revoked) and its 2 audit rows are still in production. Leaving them is consistent with the append-only audit log.

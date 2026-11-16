@@ -14,7 +14,7 @@ Changes from the draft write-up to `Canon_Round3_Final_Submission` (16 Nov 2026)
 
 | Draft claim | What the final version says | Why |
 |---|---|---|
-| Security hardening items (token hash access, one-way revocation, notification scoping, Storage folder validation) | Applied to the production database as a separate step. The SQL is in `supabase/round3-production/hardening/`, which is **not committed** and not part of `87904388`. | `git status` shows that folder as untracked. The production application was reported by the team's logs and was not re-checked in this review. |
+| Security hardening items (token hash access, one-way revocation, notification scoping, Storage folder validation) | Applied to the production database as a separate step. The SQL is in `supabase/round3-production/hardening/`, which was **not committed** at that point (since committed in `c831826` on `round3-final-readiness`) and is not part of `87904388`. | `git status` shows that folder as untracked. The production application was reported by the team's logs and was not re-checked in this review. |
 | "Build, lint and type checks passed" | Vercel build READY (checked through the Vercel API). `tsc` passed; lint passed with 0 errors and 3 warnings; 110/110 unit tests passed in 13 files, with the live RLS test excluded. | These checks were re-run during this review. The draft did not mention the lint warnings or what the test run covered. |
 | "Smoke-tested using Brand Manager, Reviewer and Creator demo sign-in flows" | Brand Manager sign-in and read-only pages were checked during this review. The Reviewer and Creator checks are credited to the team's earlier smoke test. | Only the Brand Manager sign-in was repeated here. |
 | "Does not currently have an Anthropic API key configured" | The production login page reports the mock provider, and every report viewed is labelled DEMO/MOCK. The code records a run as `mock` only when `CANON_AI_MOCK=1`. Environment variables were not inspected. | The login page shows mock mode when `CANON_AI_MOCK=1` **or** no key is set, so whether a key is configured was not confirmed. |
@@ -42,10 +42,18 @@ Changes from the draft write-up to `Canon_Round3_Final_Submission` (16 Nov 2026)
 
 ## Final readiness review (16 Nov 2026, later)
 
-- Section 7 and Appendix A: production hardening is now **verified** with a read-only catalog query, not just reported by the team. It is also written as migration `0007_round3_hardening.sql`, which is not yet committed.
+- Section 7 and Appendix A: production hardening is now **verified** with a read-only catalog query, not just reported by the team. It is also written as migration `0007_round3_hardening.sql`, which was not yet committed at that point (superseded: since committed as `c831826` on branch `round3-final-readiness`; not merged into `main`).
 - Section 7: added a row with the check results for the working copy (113/113 tests in 14 files; the 0007 test passed 27/27).
 - Section 5: says where the override reason is enforced (the server action and the `finding_decisions` CHECK constraint).
 - Section 10: added "No native CMS integration". Section 11: the hardening item now refers to 0007.
 - New **Appendix B** (page 14) maps each Round 2 promise to delivered, partial or not done. The page is added at the end, so no earlier page numbers change.
 - Appendix A note: the "nothing changed" statement now applies to production. Application code in the working copy was changed in this review.
 - PDF regenerated with `msedge --headless --print-to-pdf --no-pdf-header-footer`: 14 pages, the same 6 screenshots, and no clipped pages.
+
+## Migration publication status correction (16 Nov 2026, after push)
+
+- Section 7 note, Section 7 checks table, Section 10 and Section 11 no longer say migration `0007_round3_hardening.sql` is uncommitted.
+  They now say it is committed and public on GitHub branch `round3-final-readiness` (commit `c831826`), not merged into `main`, and not re-applied to production because the hardening was already verified as present there.
+- Section 10 row renamed from "Hardening migration uncommitted" to "Hardening migration not on `main`". Section 11 now says "Merge" instead of "Commit".
+- Production is unchanged: deployment commit `87904388`. Appendix B is unchanged.
+- PDF regenerated with `msedge --headless --print-to-pdf --no-pdf-header-footer`: 14 pages; only pages 10 and 12 changed, and both were rendered and checked: no clipping.

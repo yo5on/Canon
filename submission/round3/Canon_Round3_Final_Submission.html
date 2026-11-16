@@ -397,7 +397,7 @@ figcaption b{color:var(--ink);font-weight:600}
     <li>Membership-aware notification access.</li>
     <li>Safer Storage folder-name validation.</li>
   </ul>
-  <div class="note warn"><p>These changes are <strong>not part of production commit <code>87904388</code></strong>. They are now written as the re-runnable migration <code>supabase/migrations/0007_round3_hardening.sql</code>, tested locally to produce the same schema as the production path. At the time of writing it is in the team's working copy and <strong>not yet committed</strong> to the public repository.</p></div>
+  <div class="note warn"><p>These changes are <strong>not part of production commit <code>87904388</code></strong>. They are now written as the re-runnable migration <code>supabase/migrations/0007_round3_hardening.sql</code>, tested locally to produce the same schema as the production path. It is committed and public on GitHub branch <code>round3-final-readiness</code> (commit <code>c831826</code>), but not merged into <code>main</code>, and was not re-applied to production, where the hardening was already verified as present.</p></div>
   <h2>Checks run during this review</h2>
   <p class="small muted" style="margin-bottom:1.5mm">16 November 2026, on the repository at <code>87904388</code>.</p>
   <table>
@@ -405,7 +405,7 @@ figcaption b{color:var(--ink);font-weight:600}
     <tr><td><code>npx tsc --noEmit</code></td><td>Passed, no errors</td></tr>
     <tr><td><code>npm run lint</code></td><td>Passed: 0 errors, 3 warnings</td></tr>
     <tr><td><code>vitest run</code> (13 test files)</td><td>110 / 110 passed. The live RLS test (<code>src/lib/rls.live.test.ts</code>) was excluded because it connects to the live database.</td></tr>
-    <tr><td>Working copy with the final-review fixes</td><td><code>tsc</code> passed; lint 0 errors, 3 warnings; <code>vitest</code> 113 / 113 passed in 14 files (live RLS test excluded); migration 0007 test 27 / 27 on local PostgreSQL 17 and 18 (PGlite).</td></tr>
+    <tr><td>Working copy with the final-review fixes (since committed as <code>c831826</code>)</td><td><code>tsc</code> passed; lint 0 errors, 3 warnings; <code>vitest</code> 113 / 113 passed in 14 files (live RLS test excluded); migration 0007 test 27 / 27 on local PostgreSQL 17 and 18 (PGlite).</td></tr>
   </table>
   <div class="foot"><span><b>Canon</b> · Brand Governance Platform</span><span>10</span></div>
 </section>
@@ -457,7 +457,7 @@ figcaption b{color:var(--ink);font-weight:600}
     <tr><td class="k">SUPPORTED is register-based</td><td>It means a claim matches the organisation's approved facts, not that the claim is independently true.</td></tr>
     <tr><td class="k">English-only OCR</td><td>Results depend on image quality. Scanned PDFs without a text layer must be uploaded as images.</td></tr>
     <tr><td class="k">HTML-only retrieval</td><td>Source retrieval reads page HTML only. Content rendered by JavaScript or behind a login is not seen.</td></tr>
-    <tr><td class="k">Hardening migration uncommitted</td><td>Migration <code>0007</code>, which matches the hardening already on production, is not yet in the public repository (Section 7).</td></tr>
+    <tr><td class="k">Hardening migration not on <code>main</code></td><td>Migration <code>0007</code>, which matches the hardening already on production, is public on branch <code>round3-final-readiness</code> (<code>c831826</code>) but not merged into <code>main</code> (Section 7).</td></tr>
     <tr><td class="k">No native CMS integration</td><td>Integration is through the publish-gate API and webhooks. There is no CMS plugin or connector (Appendix B).</td></tr>
     <tr><td class="k">Leaked-password protection</td><td>Not enabled at the time of the team's security review (<code>docs/SECURITY_HARDENING.md</code>), because the Supabase project is on the Free plan.</td></tr>
   </table>
@@ -465,7 +465,7 @@ figcaption b{color:var(--ink);font-weight:600}
   <div class="kicker" style="margin-top:9mm">11 · Future Scope</div>
   <ul class="clean">
     <li>Enable live model analysis behind the existing schema validation, verifier, Claims Ledger and daily token budget.</li>
-    <li>Commit migration <code>0007_round3_hardening.sql</code> so the public repository matches the production schema.</li>
+    <li>Merge migration <code>0007_round3_hardening.sql</code> into <code>main</code> so the default branch matches the production schema.</li>
     <li>Add more OCR languages and layout-aware extraction for multi-column PDFs.</li>
     <li>Native connectors for common CMS and design tools that call the existing publish-gate API.</li>
   </ul>

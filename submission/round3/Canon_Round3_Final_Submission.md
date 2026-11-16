@@ -200,7 +200,7 @@ Reads made for a user use that user's session, so Postgres RLS decides what they
 - Membership-aware notification access.
 - Safer Storage folder-name validation.
 
-> **Note:** these changes are **not part of production commit `87904388`**. They are now written as the re-runnable migration `supabase/migrations/0007_round3_hardening.sql`, tested locally to produce the same schema as the production path. At the time of writing it is in the team's working copy and **not yet committed** to the public repository.
+> **Note:** these changes are **not part of production commit `87904388`**. They are now written as the re-runnable migration `supabase/migrations/0007_round3_hardening.sql`, tested locally to produce the same schema as the production path. It is committed and public on GitHub branch `round3-final-readiness` (commit `c831826`), but not merged into `main`, and was not re-applied to production, where the hardening was already verified as present.
 
 **Checks run during this review (16 Nov 2026, on the repository at `87904388`):**
 
@@ -209,7 +209,7 @@ Reads made for a user use that user's session, so Postgres RLS decides what they
 | `npx tsc --noEmit` | Passed, no errors |
 | `npm run lint` | Passed: 0 errors, 3 warnings |
 | `vitest run` (13 test files) | 110 / 110 passed. The live RLS test (`src/lib/rls.live.test.ts`) was excluded because it connects to the live database. |
-| Working copy with the final-review fixes | `tsc` passed; lint 0 errors, 3 warnings; `vitest` 113 / 113 passed in 14 files (live RLS test excluded); migration 0007 test 27 / 27 on local PostgreSQL 17 and 18 (PGlite). |
+| Working copy with the final-review fixes (since committed as `c831826`) | `tsc` passed; lint 0 errors, 3 warnings; `vitest` 113 / 113 passed in 14 files (live RLS test excluded); migration 0007 test 27 / 27 on local PostgreSQL 17 and 18 (PGlite). |
 
 ## 8. Production Deployment
 
@@ -253,14 +253,14 @@ The production deployment uses the **demo/mock AI provider** (`src/lib/ai.mock.t
 | SUPPORTED is register-based | It means a claim matches the organisation's approved facts, not that the claim is independently true. |
 | English-only OCR | Results depend on image quality. Scanned PDFs without a text layer must be uploaded as images. |
 | HTML-only retrieval | Source retrieval reads page HTML only. Content rendered by JavaScript or behind a login is not seen. |
-| Hardening migration uncommitted | Migration `0007`, which matches the hardening already on production, is not yet in the public repository (Section 7). |
+| Hardening migration not on `main` | Migration `0007`, which matches the hardening already on production, is public on branch `round3-final-readiness` (`c831826`) but not merged into `main` (Section 7). |
 | No native CMS integration | Integration is through the publish-gate API and webhooks. There is no CMS plugin or connector (Appendix B). |
 | Leaked-password protection | Not enabled at the time of the team's security review (`docs/SECURITY_HARDENING.md`), because the Supabase project is on the Free plan. |
 
 ## 11. Future Scope
 
 - Enable live model analysis behind the existing schema validation, verifier, Claims Ledger and daily token budget.
-- Commit migration `0007_round3_hardening.sql` so the public repository matches the production schema.
+- Merge migration `0007_round3_hardening.sql` into `main` so the default branch matches the production schema.
 - Add more OCR languages and layout-aware extraction for multi-column PDFs.
 - Native connectors for common CMS and design tools that call the existing publish-gate API.
 
